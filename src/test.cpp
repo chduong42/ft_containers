@@ -6,7 +6,7 @@
 /*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/17 16:36:55 by kennyduong        #+#    #+#             */
-/*   Updated: 2022/08/24 16:51:28 by kennyduong       ###   ########.fr       */
+/*   Updated: 2022/08/27 19:14:54 by kennyduong       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,10 @@
 
 int main(void)
 {
-    std::vector<int> v(10, 42);
-    std::iterator_traits<std::vector<int>::iterator>::difference_type n = v.end() - v.begin();
-    std::vector<int>::iterator it = v.begin();
+    std::iterator<std::bidirectional_iterator_tag, int> it;
+    ft::iterator<ft::bidirectional_iterator_tag, int> it2;
+    std::vector<int> v;
+
+    
     return 0;   
 }
