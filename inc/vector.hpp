@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   vector.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
+/*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 18:56:26 by kennyduong        #+#    #+#             */
-/*   Updated: 2022/08/24 16:48:44 by kennyduong       ###   ########.fr       */
+/*   Updated: 2022/12/15 02:24:50 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 # include "iterator.hpp"
 
 namespace ft {
-	template<class T, class Allocator = std::allocator<T>> class vector {
+	template<class T, class Allocator = std::allocator<T> > class vector {
 		private:
 			T*												_data;
 			size_t											_size;

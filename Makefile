@@ -3,65 +3,65 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+         #
+#    By: chduong <chduong@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/10 17:16:04 by chduong           #+#    #+#              #
-#    Updated: 2022/08/17 16:38:02 by kennyduong       ###   ########.fr        #
+#    Updated: 2022/12/14 21:56:23 by chduong          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 #########################################
-#			EXEC NAME & FOLDERS			#
+#		EXEC, COMMANDS & FLAGS			#
 #########################################
-NAME		=	ft_containers
-SRC_DIR		=	src/
-OBJ_DIR		=	obj/
-INC_DIR		=	inc/
+NAME		=	test
 
-#########################################
-#				COMMANDS				#
-#				FLAGS					#
-#########################################
 CXX			=	c++ -c
+CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98 $(INC) $(DEPFLAG)
+INC			=	-I inc
+DEPFLAG		=	-MMD -MP
+DEBUG		=	-g3 -fsanitize=address,undefined
+
 LINK		=	c++
+LFLAGS		=	
+
 MKDIR		=	mkdir -p
 AR			=	ar rcs
 RM			= 	rm -rf
 
-CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98
-CXXFLAGS	+=	-MMD -MP -g3
-
-LFLAGS		=	
-DEBUG		=	-g3 -fsanitize=address,undefined
-INC			=	-I inc
+VALGRIND	=	valgrind $(LEAK)
+FD			=	--track-fds=yes
+LEAK		=	--leak-check=yes --show-reachable=yes
+MEMCHECK	=	--tool=memcheck
 
 #########################################
-#			SOURCES	FILES				#
-#           & OBJECT FILES    	        #
-#           & DEPENDENCIES    	        #
+#	SOURCES - OBJECTS - DEPENDENCIES	#
 #########################################
-SRC		=	test.cpp
+SRC			=	main.cpp
 
-OBJ		=	$(SRC:%.cpp=%.o)
-OBJ		:=	$(addprefix $(OBJ_DIR), $(OBJ))
-
-DEP		=	${OBJ:.o=.d}
+SRC_DIR		=	src/
+OBJ_DIR		=	obj/
+OBJ			=	$(SRC:%.cpp=%.o)
+OBJ			:=	$(addprefix $(OBJ_DIR), $(OBJ))
+DEP			=	${OBJ:.o=.d}
 
 #########################################
 #			MAKE	RULES				#
 #########################################
 $(NAME): $(OBJ)
 	@echo "> $(CYAN)Generate objects$(END) : \t\t[$(GREEN)OK$(END)]"
-	$(LINK) $(LFLAGS) -o $@ $^
+	@$(LINK) $(LFLAGS) -o $@ $^
 	@echo "> $(CYAN)Compilation$(END) : \t\t[$(YELLOW)COMPLETE$(END)]"
 
 -include ${DEP}
 
 ${OBJ_DIR}%.o:	${SRC_DIR}%.cpp
 	@${MKDIR} ${@D}
-	${CXX} ${CXXFLAGS} ${INC} $< -o $@
+	${CXX} ${CXXFLAGS} $< -o $@
 
 all: $(NAME)
+
+check:
+	$(VALGRIND) $(NAME)
 
 clean:
 	@$(RM) $(OBJ_DIR)
@@ -78,14 +78,14 @@ re: fclean all
 #########################################
 #			SYNTAX COLORS				#
 #########################################
-GREY       =   $'\033[0;30m
-RED        =   $'\033[0;31m
-GREEN      =   $'\033[0;92m
-YELLOW     =   $'\033[0;33m
-BLUE       =   $'\033[0;34m
-U_BLUE     =   $'\033[4;34m
-PURPLE     =   $'\033[0;35m
-CYAN       =   $'\033[0;96m
-WHITE      =   $'\033[0;37m
-END        =   $'\033[0;m
-BOLD       =   $'\e[1m
+GREY		=   $'\033[0;30m
+RED			=   $'\033[0;31m
+GREEN		=   $'\033[0;92m
+YELLOW		=   $'\033[0;33m
+BLUE		=   $'\033[0;34m
+U_BLUE		=   $'\033[4;34m
+PURPLE		=   $'\033[0;35m
+CYAN		=   $'\033[0;96m
+WHITE		=   $'\033[0;37m
+END			=   $'\033[0;m
+BOLD		=   $'\e[1m
