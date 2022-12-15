@@ -6,21 +6,18 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 23:06:09 by chduong           #+#    #+#             */
-/*   Updated: 2022/12/15 03:13:27 by chduong          ###   ########.fr       */
+/*   Updated: 2022/12/15 04:18:15 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TYPE_TRAITS_HPP
 # define TYPE_TRAITS_HPP
-# include <cstddef>
 
 namespace ft 
 {
-    template<bool B, class T = void >
-        struct enable_if {};
-        
-    template<class T>
-        struct enable_if<true, T> {typedef T type; };
+    template<bool B, class T = void > struct enable_if {};
+    
+    template<class T> struct enable_if<true, T> {typedef T type; };
 
     template <class T, T v> struct integral_constant {
         // Member types
