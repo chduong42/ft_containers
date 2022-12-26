@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   vector.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
+/*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 18:56:26 by kennyduong        #+#    #+#             */
-/*   Updated: 2022/12/15 02:24:50 by chduong          ###   ########.fr       */
+/*   Updated: 2022/12/19 19:24:20 by kennyduong       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,19 +24,19 @@ namespace ft {
 		
 		public:
 			// ====================== Member Types ========================= //
-			typedef T																		value_type;
-			typedef Allocator																allocator_type;
-			typedef ptrdiff_t																difference_type;	
-			typedef size_t																	size_type;
-			typedef T&																		reference;
-			typedef const T&																const_reference;
+			typedef T													value_type;
+			typedef Allocator											allocator_type;
+			typedef ptrdiff_t											difference_type;	
+			typedef size_t												size_type;
+			typedef T&													reference;
+			typedef const T&											const_reference;
 				
-			typedef typename Allocator::pointer												pointer;
-			typedef typename Allocator::const_pointer										const_pointer;
-			typedef typename ft::random_access_iterator<T>									iterator;
-			typedef typename ft::random_access_iterator<const T>							const_iterator;
-			typedef typename ft::reverse_iterator<iterator>									reverse_iterator;
-			typedef typename ft::reverse_iterator<const_iterator>							const_reverse_iterator;	
+			typedef typename Allocator::pointer							pointer;
+			typedef typename Allocator::const_pointer					const_pointer;
+			typedef typename ft::random_access_iterator<T>				iterator;
+			typedef typename ft::random_access_iterator<const T>		const_iterator;
+			typedef typename ft::reverse_iterator<iterator>				reverse_iterator;
+			typedef typename ft::reverse_iterator<const_iterator>		const_reverse_iterator;	
 			
 			// ====================== Member Functions ========================= //
 			// ---------------------- Constructors ----------------------------- //
