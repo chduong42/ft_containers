@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   vector.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
+/*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 18:56:26 by kennyduong        #+#    #+#             */
-/*   Updated: 2022/12/19 19:24:20 by kennyduong       ###   ########.fr       */
+/*   Updated: 2023/01/03 19:04:24 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ namespace ft {
 			//---------------------- Destructor -------------------------------
 			~vector() {}
 
-			// //---------------------- Overload Operator -------------------------------
+			//---------------------- Overload Operator -------------------------------
 			vector		&operator=(const vector &src) {
 				if (this != &src) {
 					_alloc.deallocate(_data, _size);
@@ -106,6 +106,7 @@ namespace ft {
 			// void 					assign(InputIterator first, InputIterator last); // Assigns new contents to the vector, replacing its current contents, and modifying its size accordingly.
 			// void						assign(size_type n, const value_type& val);
 			// void						push_back(const value_type& val);
+			
 			// template<class... Args>
 			// void 					emplace_back(Args&&... args); // insert a new element at the end of the vector, right after its current last element
 			// void						pop_back();

@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   stack.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
+/*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 22:09:12 by chduong           #+#    #+#             */
-/*   Updated: 2022/12/23 03:09:05 by kennyduong       ###   ########.fr       */
+/*   Updated: 2023/01/03 19:42:11 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef STACK_HPP
 # define STACK_HPP
 # include <vector>
+# include <stack>
 
 namespace ft 
 {
@@ -41,25 +42,13 @@ namespace ft
 			void                    pop() { _ctnr.pop_back(); }
 			
 			// ---------------------- Non-member Functions ----------------------------- //
-			template <class T, class Container>
-			bool operator==(const stack<T,Container>& lhs, const stack<T,Container>& rhs) { return lhs._ctnr == rhs._ctnr; }
-			
-			template <class T, class Container>
-			bool operator!=(const stack<T,Container>& lhs, const stack<T,Container>& rhs) { return lhs._ctnr != rhs._ctnr; }
-			
-			template <class T, class Container>
-			bool operator<(const stack<T,Container>& lhs, const stack<T,Container>& rhs) { return lhs._ctnr < rhs._ctnr; }
-
-			template <class T, class Container>
-			bool operator<=(const stack<T,Container>& lhs, const stack<T,Container>& rhs) { return lhs._ctnr <= rhs._ctnr; }
-
-			template <class T, class Container>
-			bool operator>(const stack<T,Container>& lhs, const stack<T,Container>& rhs) { return lhs._ctnr > rhs._ctnr; }
-			
-			template <class T, class Container>
-			bool operator>=(const stack<T,Container>& lhs, const stack<T,Container>& rhs) { return lhs._ctnr >= rhs._ctnr; }
+			friend bool operator==(const stack<T,Container>& lhs, const stack<T,Container>& rhs) {return lhs._ctnr == rhs._ctnr;}
+			friend bool operator!=(const stack<T,Container>& lhs, const stack<T,Container>& rhs) {return lhs._ctnr != rhs._ctnr;}
+			friend bool operator<(const stack<T,Container>& lhs, const stack<T,Container>& rhs) {return lhs._ctnr < rhs._ctnr;}
+			friend bool operator<=(const stack<T,Container>& lhs, const stack<T,Container>& rhs) {return lhs._ctnr <= rhs._ctnr;}
+			friend bool operator>(const stack<T,Container>& lhs, const stack<T,Container>& rhs) {return lhs._ctnr > rhs._ctnr;}
+			friend bool operator>=(const stack<T,Container>& lhs, const stack<T,Container>& rhs) {return lhs._ctnr >= rhs._ctnr;}
 	};
 }
-
 
 #endif
