@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 18:56:26 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/01/03 19:04:24 by chduong          ###   ########.fr       */
+/*   Updated: 2023/01/04 17:32:39 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,16 +76,16 @@ namespace ft {
 			}
 
 			// //---------------------- Element access -------------------------------
-			// vector						&operator[](size_type n);
-			// vector const				&operator[](size_type n) const; // return a reference to the element at position n in the vector
-			// reference 					at(size_type n);
-			// const_reference				at(size_type n) const;
-			// reference 					front();
-			// const_reference				front() const;
-			// reference					back();
-			// const_reference				back() const;
-			// value_type*					data() noexcept;
-			// const value_type*			data() const noexcept;
+			vector						&operator[](size_type n){return _data[n];}
+			vector const				&operator[](size_type n) const {return _data[n];}
+			reference 					at(size_type n) {return _data[n];}
+			const_reference				at(size_type n) const {return _data[n];}
+			reference 					front() {return _data[0];}
+			const_reference				front() const {return _data[0];}
+			reference					back() {return _data[_size - 1];}
+			const_reference				back() const {return _data[_size - 1];}
+			value_type*					data() noexcept {return _data;}
+			const value_type*			data() const noexcept {return _data;}
 
 			// //---------------------- Iterators ----------------------//
 			// iterator					begin();

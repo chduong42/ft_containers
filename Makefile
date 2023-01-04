@@ -6,7 +6,7 @@
 #    By: chduong <chduong@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/10 17:16:04 by chduong           #+#    #+#              #
-#    Updated: 2022/12/14 21:56:23 by chduong          ###   ########.fr        #
+#    Updated: 2023/01/04 17:01:43 by chduong          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,8 @@
 NAME		=	test
 
 CXX			=	c++ -c
-CXXFLAGS	=	-Wall -Wextra -Werror -std=c++98 $(INC) $(DEPFLAG)
+CXXFLAGS	=	-Wall -Wextra -Werror  $(INC) $(DEPFLAG)
+VERSION		=	-std=c++98 
 INC			=	-I inc
 DEPFLAG		=	-MMD -MP
 DEBUG		=	-g3 -fsanitize=address,undefined
@@ -36,7 +37,7 @@ MEMCHECK	=	--tool=memcheck
 #########################################
 #	SOURCES - OBJECTS - DEPENDENCIES	#
 #########################################
-SRC			=	main.cpp
+SRC			=	algorithm_test.cpp
 
 SRC_DIR		=	src/
 OBJ_DIR		=	obj/
