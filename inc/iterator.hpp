@@ -6,7 +6,7 @@
 /*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 15:17:18 by kennyduong        #+#    #+#             */
-/*   Updated: 2022/08/24 15:39:26 by kennyduong       ###   ########.fr       */
+/*   Updated: 2023/01/06 17:40:52 by kennyduong       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,12 @@ namespace ft
 			T*	_ptr;
 		
 		public:
+			typedef T											value_type;
+			typedef T*											pointer;
+			typedef T&											reference;
+			typedef bidirectional_iterator_tag					iterator_category;
+			typedef ptrdiff_t									difference_type;
+		
 			bidirectional_iterator() : _ptr(NULL) {}
 			bidirectional_iterator(T* ptr) : _ptr(ptr) {}
 			bidirectional_iterator(const bidirectional_iterator& src) : _ptr(src._ptr) {}
@@ -85,6 +91,12 @@ namespace ft
 			T*	_ptr;
 
 		public:
+			typedef T											value_type;
+			typedef T*											pointer;
+			typedef T&											reference;
+			typedef random_access_iterator_tag					iterator_category;
+			typedef ptrdiff_t									difference_type;
+		
 			random_access_iterator() : _ptr(NULL) {}
 			random_access_iterator(T* ptr) : _ptr(ptr) {}
 			random_access_iterator(const random_access_iterator& src) : _ptr(src._ptr) {}
@@ -125,6 +137,12 @@ namespace ft
 			I	_ptr;
 		
 		public:
+			typedef typename iterator_traits<I>::value_type				value_type;
+			typedef typename iterator_traits<I>::pointer				pointer;
+			typedef typename iterator_traits<I>::reference				reference;
+			typedef typename iterator_traits<I>::iterator_category		iterator_category;
+			typedef typename iterator_traits<I>::difference_type		difference_type;
+			
 			reverse_iterator() : _ptr(NULL) {}
 			reverse_iterator(I ptr) : _ptr(ptr) {}
 			reverse_iterator(const reverse_iterator& src) : _ptr(src._ptr) {}

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: chduong <chduong@student.42.fr>            +#+  +:+       +#+         #
+#    By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/10 17:16:04 by chduong           #+#    #+#              #
-#    Updated: 2023/01/04 17:01:43 by chduong          ###   ########.fr        #
+#    Updated: 2023/01/11 11:59:56 by kennyduong       ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@
 NAME		=	test
 
 CXX			=	c++ -c
-CXXFLAGS	=	-Wall -Wextra -Werror  $(INC) $(DEPFLAG)
+CXXFLAGS	=	-Wall -Wextra -Werror $(INC) $(DEPFLAG)
 VERSION		=	-std=c++98 
 INC			=	-I inc
 DEPFLAG		=	-MMD -MP
@@ -37,7 +37,7 @@ MEMCHECK	=	--tool=memcheck
 #########################################
 #	SOURCES - OBJECTS - DEPENDENCIES	#
 #########################################
-SRC			=	algorithm_test.cpp
+SRC			=	enableif_test.cpp
 
 SRC_DIR		=	src/
 OBJ_DIR		=	obj/
