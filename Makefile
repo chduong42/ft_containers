@@ -6,7 +6,7 @@
 #    By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/10 17:16:04 by chduong           #+#    #+#              #
-#    Updated: 2023/01/11 11:59:56 by kennyduong       ###   ########.fr        #
+#    Updated: 2023/01/11 13:00:08 by kennyduong       ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,6 +14,7 @@
 #		EXEC, COMMANDS & FLAGS			#
 #########################################
 NAME		=	test
+STD 		=	std
 
 CXX			=	c++ -c
 CXXFLAGS	=	-Wall -Wextra -Werror $(INC) $(DEPFLAG)
@@ -37,7 +38,7 @@ MEMCHECK	=	--tool=memcheck
 #########################################
 #	SOURCES - OBJECTS - DEPENDENCIES	#
 #########################################
-SRC			=	enableif_test.cpp
+SRC			=	main.cpp
 
 SRC_DIR		=	src/
 OBJ_DIR		=	obj/
@@ -57,7 +58,15 @@ $(NAME): $(OBJ)
 
 ${OBJ_DIR}%.o:	${SRC_DIR}%.cpp
 	@${MKDIR} ${@D}
-	${CXX} ${CXXFLAGS} $< -o $@
+	${CXX} ${CXXFLAGS} -std=c++98 $< -o $@
+
+obj/stdfunc_test.o: src/stdfunc_test.cpp
+	@${MKDIR} ${@D}
+	${CXX} ${CXXFLAGS} -std=c++11 $< -o $@
+
+$(STD): obj/stdfunc_test.o
+	@$(LINK) $(LFLAGS) -o $@ $^
+	@echo "> $(CYAN)Compilation STD TEST$(END) : \t\t[$(YELLOW)COMPLETE$(END)]"
 
 all: $(NAME)
 
@@ -70,6 +79,7 @@ clean:
 	
 fclean: clean
 	@$(RM) $(NAME)
+	@$(RM) $(STD)
 	@echo "> $(PURPLE)Delete Exec$(END) : \t\t[$(GREEN)OK$(END)]"
 	
 re: fclean all

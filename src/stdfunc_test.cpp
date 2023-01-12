@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   algorithm_test.cpp                                 :+:      :+:    :+:   */
+/*   stdfunc_test.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
+/*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/04 16:27:25 by chduong           #+#    #+#             */
-/*   Updated: 2023/01/04 17:22:21 by chduong          ###   ########.fr       */
+/*   Updated: 2023/01/11 12:11:47 by kennyduong       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,27 @@
 #include <utility>      // std::pair, std::make_pair
 #include <string>       // std::string
 #include <iostream>    // std::cout
+
+// for the test: 
+//// for std
+template <class T>
+typename std::enable_if<std::is_integral<T>::value,bool>::type
+  is_odd_std (T i) {return bool(i%2);}
+
+// 2. the second template argument is only valid if T is an integral type:
+template < class T,
+           class = typename std::enable_if<std::is_integral<T>::value>::type>
+bool is_even_std (T i) {return !bool(i%2);}
+
+//// for ft
+template <class T>
+typename ft::enable_if<ft::is_integral<T>::value,bool>::type
+  is_odd_ft (T i) {return bool(i%2);}
+
+// 2. the second template argument is only valid if T is an integral type:
+template < class T,
+           class = typename ft::enable_if<ft::is_integral<T>::value>::type>
+bool is_even_ft (T i) {return !bool(i%2);}
 
 int main()
 {
@@ -82,7 +103,7 @@ int main()
     std::cout << "is_integral<std::string> : " << std::is_integral<std::string>::value << std::endl;
     std::cout << "is_integral<std::string> : " << ft::is_integral<std::string>::value << std::endl;
 
-    std::cout << std::endl << std::endl;
+    std::cout << std::endl;
     std::cout << "===============STD::PAIR===============" << std::endl;
 
     std::pair <std::string,double> std_product1;                     // default constructor
@@ -109,6 +130,16 @@ int main()
 
     std::cout << "std:: The price of " << std_product3.first << " is $" << std_product3.second << '\n';
     std::cout << "ft:: The price of " << product3.first << " is $" << product3.second << "\n\n";
+    
+    std::cout << "===============STD::ENABLE_IF===============" << std::endl;
+    short int i = 1;    // code does not compile if type of i is not integral
+    std::cout << std::boolalpha;
+    
+    std::cout << "std:: i is odd: " << is_odd_std(i) << std::endl;
+    std::cout << "ft:: i is odd: " << is_odd_ft(i) << std::endl << std::endl;
+    
+    std::cout << "std:: i is even: " << is_even_std(i) << std::endl;
+    std::cout << "ft:: i is even: " << is_even_ft(i) << std::endl;
     
     return (0);
 }
