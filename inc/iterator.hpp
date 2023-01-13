@@ -6,7 +6,7 @@
 /*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 15:17:18 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/01/12 14:05:14 by kennyduong       ###   ########.fr       */
+/*   Updated: 2023/01/12 18:19:58 by kennyduong       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,6 @@ namespace ft
 	template<class Iter1, class Iter2> bool operator>(const reverse_iterator<Iter1>& lhs, const reverse_iterator<Iter2>& rhs) {return lhs.base() < rhs.base();}
 	template<class Iter1, class Iter2> bool operator>=(const reverse_iterator<Iter1>& lhs, const reverse_iterator<Iter2>& rhs) {return lhs.base() <= rhs.base();}
 	
-	
 	template<class T> class bidirectional_iterator : public iterator<bidirectional_iterator_tag, T> {
 		protected:
 			T*	_ptr;
@@ -138,7 +137,7 @@ namespace ft
 			bidirectional_iterator& operator--(int) { bidirectional_iterator tmp(*this); --_ptr; return tmp; }
 	};
 
-	template<class T> class random_access_iterator : iterator<random_access_iterator_tag, T> {
+	template<class T> class random_access_iterator : public iterator<random_access_iterator_tag, T> {
 		protected:
 			T*	_ptr;
 
@@ -173,17 +172,54 @@ namespace ft
 
 			random_access_iterator& operator++() {++_ptr; return *this;}
 			random_access_iterator& operator--() {--_ptr; return *this;}
-			random_access_iterator& operator++(int) { random_access_iterator tmp(*this); ++_ptr; return tmp; }
-			random_access_iterator& operator--(int) { random_access_iterator tmp(*this); --_ptr; return tmp; }
+			random_access_iterator operator++(int) { random_access_iterator tmp(*this); ++_ptr; return tmp; }
+			random_access_iterator operator--(int) { random_access_iterator tmp(*this); --_ptr; return tmp; }
 			random_access_iterator& operator+=(difference_type n) {_ptr += n; return *this;}
 			random_access_iterator& operator-=(difference_type n) {_ptr -= n; return *this;}
-			random_access_iterator&	operator+(difference_type n) const {return random_access_iterator(_ptr + n);}
-			random_access_iterator&	operator-(difference_type n) const {return random_access_iterator(_ptr - n);}
+			random_access_iterator	operator+(difference_type n) const {return random_access_iterator(_ptr + n);}
+			random_access_iterator	operator-(difference_type n) const {return random_access_iterator(_ptr - n);}
 
 			difference_type			operator+(const random_access_iterator& src) const {return _ptr + src._ptr;}
 			difference_type			operator-(const random_access_iterator& src) const {return _ptr - src._ptr;}
 	};
 
+	template <typename T1, typename T2>
+	bool operator==(const random_access_iterator<T1>& lhs, const random_access_iterator<T2>& rhs) {return (lhs.base() == rhs.base());}
+	
+	template <typename T1, typename T2>
+	bool operator!=(const random_access_iterator<T1>& lhs, const random_access_iterator<T2>& rhs) {return (lhs.base() != rhs.base());}
+	
+	template <typename T1, typename T2>
+	bool operator< (const random_access_iterator<T1>& lhs, const random_access_iterator<T2>& rhs) {return (lhs.base() < rhs.base());}
+	
+	template <typename T1, typename T2>
+	bool operator> (const random_access_iterator<T1>& lhs, const random_access_iterator<T2>& rhs) {return (lhs.base() > rhs.base());}
+	
+	template <typename T1, typename T2>
+	bool operator<=(const random_access_iterator<T1>& lhs, const random_access_iterator<T2>& rhs) {return (lhs.base() <= rhs.base());}
+	
+	template <typename T1, typename T2>
+	bool operator>=(const random_access_iterator<T1>& lhs, const random_access_iterator<T2>& rhs) {return (lhs.base() >= rhs.base());}
+
+	template <typename T>
+	random_access_iterator<T> operator+(typename random_access_iterator<T>::difference_type n, const random_access_iterator<T>& rev_it) {
+		return (rev_it + n);
+	}
+
+	template <typename T1, typename T2>
+	typename random_access_iterator<T1>::difference_type operator-(const random_access_iterator<T1>& lhs, const random_access_iterator<T2>& rhs) {
+		return (lhs.base() - rhs.base());
+	}
+
+	template<typename Iterator>
+	std::ptrdiff_t distance(Iterator first, Iterator last) {
+		std::ptrdiff_t dist = 0;
+		while (first != last) {
+			++dist;
+			++first;
+		}
+		return (dist);
+	}
 }
 
 #endif
