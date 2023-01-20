@@ -6,7 +6,7 @@
 /*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 22:09:12 by chduong           #+#    #+#             */
-/*   Updated: 2023/01/20 18:30:57 by kennyduong       ###   ########.fr       */
+/*   Updated: 2023/01/20 18:52:21 by kennyduong       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,24 @@ namespace ft
 			typedef typename ft::reverse_iterator<const_iterator>				const_reverse_iterator;
 			typedef typename ft::iterator_traits<iterator>::difference_type		difference_type;
 			typedef typename ft::iterator_traits<iterator>::size_type			size_type;
-			
+		
+			// ====================== Member Classes ========================= //
+			class value_compare : public std::binary_function<value_type, value_type, bool> {
+				friend class map;
+				protected:
+					Compare comp;
+					value_compare(Compare c) : comp(c) {}
+				public:
+					typedef bool result_type;
+					typedef value_type first_argument_type;
+					typedef value_type second_argument_type;
+					bool operator()(const value_type& x, const value_type& y) const { return comp(x.first, y.first); }
+			};
+		
 		private:
 			// ====================== Member Variables ========================= //
 			std::vector<std::pair<const Key, T> >				_ctnr;
-			Compare												_comp;
+			key_compare											_comp;
 			Allocator											_alloc;
 
 		public:
@@ -84,10 +97,8 @@ namespace ft
 			// Modifiers
 			pair<iterator,bool> 					insert(const value_type& val) { return _ctnr.insert(val); }
 			iterator 								insert(iterator position, const value_type& val) { return _ctnr.insert(position, val); }
-			
 			template <class InputIterator>
 			void 									insert(InputIterator first, InputIterator last) { _ctnr.insert(first, last); }
-			
 			void 									erase(iterator position) { _ctnr.erase(position); }
 			size_type 								erase(const key_type& k) { return _ctnr.erase(k); }
 			void 									erase(iterator first, iterator last) { _ctnr.erase(first, last); }
@@ -110,12 +121,12 @@ namespace ft
 			value_compare 							value_comp() const { return _comp; }
 			
 			// Non-member function overloads
-			friend bool 							operator==(const map& lhs, const map& rhs) { return lhs._ctnr == rhs._ctnr; }
-			friend bool 							operator!=(const map& lhs, const map& rhs) { return lhs._ctnr != rhs._ctnr; }
-			friend bool 							operator<(const map& lhs, const map& rhs) { return lhs._ctnr < rhs._ctnr; }
-			friend bool 							operator<=(const map& lhs, const map& rhs) { return lhs._ctnr <= rhs._ctnr; }
-			friend bool 							operator>(const map& lhs, const map& rhs) { return lhs._ctnr > rhs._ctnr; }
-			friend bool 							operator>=(const map& lhs, const map& rhs) { return lhs._ctnr >= rhs._ctnr;}
+			friend bool 							operator==(const map& lhs, const map& rhs)	{return lhs._ctnr == rhs._ctnr;}
+			friend bool 							operator!=(const map& lhs, const map& rhs)	{return lhs._ctnr != rhs._ctnr;}
+			friend bool 							operator<(const map& lhs, const map& rhs)	{return lhs._ctnr <  rhs._ctnr;}
+			friend bool 							operator<=(const map& lhs, const map& rhs)	{return lhs._ctnr <= rhs._ctnr;}
+			friend bool 							operator>(const map& lhs, const map& rhs)	{return lhs._ctnr >  rhs._ctnr;}
+			friend bool 							operator>=(const map& lhs, const map& rhs)	{return lhs._ctnr >= rhs._ctnr;}
 	};
 }
 
