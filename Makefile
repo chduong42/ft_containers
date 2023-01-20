@@ -6,7 +6,7 @@
 #    By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/10 17:16:04 by chduong           #+#    #+#              #
-#    Updated: 2023/01/11 13:00:08 by kennyduong       ###   ########.fr        #
+#    Updated: 2023/01/20 15:23:02 by kennyduong       ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -38,7 +38,7 @@ MEMCHECK	=	--tool=memcheck
 #########################################
 #	SOURCES - OBJECTS - DEPENDENCIES	#
 #########################################
-SRC			=	main.cpp
+SRC			=	rbt_test.cpp
 
 SRC_DIR		=	src/
 OBJ_DIR		=	obj/

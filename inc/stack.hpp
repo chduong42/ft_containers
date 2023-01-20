@@ -3,21 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   stack.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
+/*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 22:09:12 by chduong           #+#    #+#             */
-/*   Updated: 2023/01/03 19:42:11 by chduong          ###   ########.fr       */
+/*   Updated: 2023/01/20 18:28:33 by kennyduong       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef STACK_HPP
 # define STACK_HPP
-# include <vector>
-# include <stack>
+# include "vector.hpp"
+# include "utility.hpp"
+# include "iterator.hpp"
+# include "algorithm.hpp"
+# include "type_traits.hpp"
 
 namespace ft 
 {
-	template <class T, class Container = std::vector<T> > class stack {
+	template <class T, class Container = ft::vector<T> > class stack {
 		private:
 			// ====================== Member Variables ========================= //
 			Container               _ctnr;
