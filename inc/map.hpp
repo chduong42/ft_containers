@@ -6,7 +6,7 @@
 /*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 22:09:12 by chduong           #+#    #+#             */
-/*   Updated: 2023/01/20 18:52:21 by kennyduong       ###   ########.fr       */
+/*   Updated: 2023/01/20 19:13:29 by kennyduong       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include "iterator.hpp"
 # include "algorithm.hpp"
 # include "type_traits.hpp"
+# include "rbt.hpp"
 
 namespace ft 
 {
@@ -55,10 +56,10 @@ namespace ft
 		
 		private:
 			// ====================== Member Variables ========================= //
-			std::vector<std::pair<const Key, T> >				_ctnr;
-			key_compare											_comp;
-			Allocator											_alloc;
-
+			// ft::rb_tree<key_type, value_type, ft::select1st<value_type>, key_compare, allocator_type>	_ctnr;
+			key_compare																					_comp;
+			allocator_type																				_alloc;
+			
 		public:
 			// ---------------------- Constructors / Destructor ----------------------- //
 			explicit map(const key_compare& comp = key_compare(), const Allocator& alloc = Allocator()) : _comp(comp), _alloc(alloc) {} // empty container
