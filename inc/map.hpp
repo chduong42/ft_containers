@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
+/*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 22:09:12 by chduong           #+#    #+#             */
-/*   Updated: 2023/01/20 19:13:29 by kennyduong       ###   ########.fr       */
+/*   Updated: 2023/01/24 12:40:38 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 
 namespace ft 
 {
-	template<class Key, class T, class Compare = std::less<Key>, class Allocator = std::allocator<ft::pair<const Key, T> > >
+	template<class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<ft::pair<const Key, T> > >
 	class map {
 		public:
 			// ====================== Member Types ========================= //
@@ -29,11 +29,11 @@ namespace ft
 			typedef T															mapped_type;
 			typedef ft::pair<const key_type, mapped_type>						value_type;
 			typedef Compare														key_compare;
-			typedef Allocator													allocator_type;
-			typedef typename Allocator::reference								reference;
-			typedef typename Allocator::const_reference							const_reference;
-			typedef typename Allocator::pointer									pointer;
-			typedef typename Allocator::const_pointer 							const_pointer;
+			typedef Alloc														allocator_type;
+			typedef typename Alloc::reference									reference;
+			typedef typename Alloc::const_reference								const_reference;
+			typedef typename Alloc::pointer										pointer;
+			typedef typename Alloc::const_pointer 								const_pointer;
 			typedef typename ft::random_access_iterator::iterator				iterator;
 			typedef typename ft::random_access_iterator::const_iterator			const_iterator;
 			typedef typename ft::reverse_iterator<iterator>						reverse_iterator;
@@ -45,7 +45,7 @@ namespace ft
 			class value_compare : public std::binary_function<value_type, value_type, bool> {
 				friend class map;
 				protected:
-					Compare comp;
+					Compare	comp;
 					value_compare(Compare c) : comp(c) {}
 				public:
 					typedef bool result_type;
@@ -56,16 +56,16 @@ namespace ft
 		
 		private:
 			// ====================== Member Variables ========================= //
-			// ft::rb_tree<key_type, value_type, ft::select1st<value_type>, key_compare, allocator_type>	_ctnr;
-			key_compare																					_comp;
-			allocator_type																				_alloc;
+			ft::RBTree<key_type, mapped_type, key_compare, allocator_type>		_ctnr;
+			key_compare															_comp;
+			allocator_type														_alloc;
 			
 		public:
 			// ---------------------- Constructors / Destructor ----------------------- //
-			explicit map(const key_compare& comp = key_compare(), const Allocator& alloc = Allocator()) : _comp(comp), _alloc(alloc) {} // empty container
+			explicit map(const key_compare& comp = key_compare(), const Alloc& alloc = Alloc()) : _comp(comp), _alloc(alloc) {} // empty container
 			
 			template <class InputIterator>
-			map(InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const Allocator& alloc = Allocator())
+			map(InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const Alloc& alloc = Alloc())
 			: _comp(comp), _alloc(alloc) { _ctnr.assign(first, last); }
 			
 			map(const map& x) : _ctnr(x._ctnr), _comp(x._comp), _alloc(x._alloc) {}
@@ -98,20 +98,19 @@ namespace ft
 			// Modifiers
 			pair<iterator,bool> 					insert(const value_type& val) { return _ctnr.insert(val); }
 			iterator 								insert(iterator position, const value_type& val) { return _ctnr.insert(position, val); }
-			template <class InputIterator>
-			void 									insert(InputIterator first, InputIterator last) { _ctnr.insert(first, last); }
+			template<class InputIterator> void		insert(InputIterator first, InputIterator last) { _ctnr.insert(first, last); }
 			void 									erase(iterator position) { _ctnr.erase(position); }
 			size_type 								erase(const key_type& k) { return _ctnr.erase(k); }
 			void 									erase(iterator first, iterator last) { _ctnr.erase(first, last); }
-			void 									swap(map& x) { _ctnr.swap(x._ctnr); }
+			void 									swap(map& x) {std::swap(_ctnr, x._ctnr); std::swap(_comp, x._comp); std::swap(_alloc, x._alloc); }
 			void 									clear() { _ctnr.clear(); }
 			
 			// Operations
 			size_type 								count(const key_type& k) const { return _ctnr.count(k); }
 			iterator 								find(const key_type& k) { return _ctnr.find(k); }
 			const_iterator 							find(const key_type& k) const { return _ctnr.find(k); }
-			pair<const_iterator,const_iterator> 	equal_range(const key_type& k) const { return _ctnr.equal_range(k); }
 			pair<iterator,iterator> 				equal_range(const key_type& k) { return _ctnr.equal_range(k); }
+			pair<const_iterator,const_iterator> 	equal_range(const key_type& k) const { return _ctnr.equal_range(k); }
 			iterator 								lower_bound(const key_type& k) { return _ctnr.lower_bound(k); }
 			const_iterator 							lower_bound(const key_type& k) const { return _ctnr.lower_bound(k); }
 			iterator 								upper_bound(const key_type& k) { return _ctnr.upper_bound(k); }
@@ -122,12 +121,13 @@ namespace ft
 			value_compare 							value_comp() const { return _comp; }
 			
 			// Non-member function overloads
-			friend bool 							operator==(const map& lhs, const map& rhs)	{return lhs._ctnr == rhs._ctnr;}
-			friend bool 							operator!=(const map& lhs, const map& rhs)	{return lhs._ctnr != rhs._ctnr;}
-			friend bool 							operator<(const map& lhs, const map& rhs)	{return lhs._ctnr <  rhs._ctnr;}
-			friend bool 							operator<=(const map& lhs, const map& rhs)	{return lhs._ctnr <= rhs._ctnr;}
-			friend bool 							operator>(const map& lhs, const map& rhs)	{return lhs._ctnr >  rhs._ctnr;}
-			friend bool 							operator>=(const map& lhs, const map& rhs)	{return lhs._ctnr >= rhs._ctnr;}
+			friend bool operator==(const map& lhs, const map& rhs)	{return lhs._ctnr == rhs._ctnr;}
+			friend bool operator!=(const map& lhs, const map& rhs)	{return lhs._ctnr != rhs._ctnr;}
+			friend bool operator<(const map& lhs, const map& rhs)	{return lhs._ctnr <  rhs._ctnr;}
+			friend bool operator<=(const map& lhs, const map& rhs)	{return lhs._ctnr <= rhs._ctnr;}
+			friend bool operator>(const map& lhs, const map& rhs)	{return lhs._ctnr >  rhs._ctnr;}
+			friend bool operator>=(const map& lhs, const map& rhs)	{return lhs._ctnr >= rhs._ctnr;}
+			friend void swap(map& lhs,map& rhs) {lhs.swap(rhs);}
 	};
 }
 

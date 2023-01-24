@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 15:17:18 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/01/14 19:00:58 by chduong          ###   ########.fr       */
+/*   Updated: 2023/01/24 15:54:13 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 
 namespace ft 
 {
-	struct bidirectional_iterator_tag {};
 	struct random_access_iterator_tag {};
 	
 	template<class Category, class T, class Distance = ptrdiff_t, class Pointer = T*, class Reference = T&>
@@ -116,7 +115,7 @@ namespace ft
 			using typename iterator<random_access_iterator_tag, T>::iterator_category;
 
 		protected:
-			pointer				_ptr;
+			pointer														_ptr;
 
 		public:
 			random_access_iterator() 									: _ptr(NULL) {}
@@ -159,7 +158,13 @@ namespace ft
 	
 	template<class Iter1, class Iter2> typename random_access_iterator<Iter1>::difference_type
 	operator- (const random_access_iterator<Iter1>& lhs,const random_access_iterator<Iter2>& rhs) {return lhs.base() - rhs.base();}
+	// ---------- End of Random access iterator
 
+
+
+
+
+	// utility functions
 	template<typename Iterator>
 	std::ptrdiff_t distance(Iterator first, Iterator last) {
 		std::ptrdiff_t dist = 0;
@@ -169,6 +174,7 @@ namespace ft
 		}
 		return (dist);
 	}
+
 }
 
 #endif
