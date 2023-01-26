@@ -6,17 +6,22 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 15:17:18 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/01/24 15:54:13 by chduong          ###   ########.fr       */
+/*   Updated: 2023/01/26 19:03:10 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef ITERATOR_HPP
 # define ITERATOR_HPP
 # include <cstddef>
+# include "RBTree.hpp"
 
 namespace ft 
 {
-	struct random_access_iterator_tag {};
+	struct input_iterator_tag { };
+	struct output_iterator_tag { };
+	struct forward_iterator_tag : public input_iterator_tag { };
+	struct bidirectional_iterator_tag : public forward_iterator_tag { };
+	struct random_access_iterator_tag : public bidirectional_iterator_tag { };
 	
 	template<class Category, class T, class Distance = ptrdiff_t, class Pointer = T*, class Reference = T&>
 	struct iterator {
@@ -52,7 +57,8 @@ namespace ft
 	};
 
 	// ---------- Reverse iterator
-	template<class Iter> class reverse_iterator {
+	template<class Iter>
+	class reverse_iterator {
 		public:
 			typedef Iter												iterator_type;
 			typedef typename iterator_traits<Iter>::iterator_category	iterator_category;
@@ -90,23 +96,24 @@ namespace ft
 			reverse_iterator 	operator-(difference_type n) const {return reverse_iterator(_base + n);}
 	};
 	
-	template<class Iter1, class Iter2> bool operator==(const reverse_iterator<Iter1>& lhs, const reverse_iterator<Iter2>& rhs)	{return lhs.base() == rhs.base();}
-	template<class Iter1, class Iter2> bool operator!=(const reverse_iterator<Iter1>& lhs, const reverse_iterator<Iter2>& rhs)	{return lhs.base() != rhs.base();}
-	template<class Iter1, class Iter2> bool operator<(const reverse_iterator<Iter1>& lhs, const reverse_iterator<Iter2>& rhs)	{return lhs.base() >  rhs.base();}
-	template<class Iter1, class Iter2> bool operator<=(const reverse_iterator<Iter1>& lhs, const reverse_iterator<Iter2>& rhs)	{return lhs.base() >= rhs.base();}
-	template<class Iter1, class Iter2> bool operator>(const reverse_iterator<Iter1>& lhs, const reverse_iterator<Iter2>& rhs)	{return lhs.base() <  rhs.base();}
-	template<class Iter1, class Iter2> bool operator>=(const reverse_iterator<Iter1>& lhs, const reverse_iterator<Iter2>& rhs)	{return lhs.base() <= rhs.base();}
-
-	template<class Iterator> reverse_iterator<Iterator> 
+	template<class Iter1, class Iter2> inline bool operator==(const reverse_iterator<Iter1>& lhs, const reverse_iterator<Iter2>& rhs)	{return lhs.base() == rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator!=(const reverse_iterator<Iter1>& lhs, const reverse_iterator<Iter2>& rhs)	{return lhs.base() != rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator<(const reverse_iterator<Iter1>& lhs, const reverse_iterator<Iter2>& rhs)	{return lhs.base() >  rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator<=(const reverse_iterator<Iter1>& lhs, const reverse_iterator<Iter2>& rhs)	{return lhs.base() >= rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator>(const reverse_iterator<Iter1>& lhs, const reverse_iterator<Iter2>& rhs)	{return lhs.base() <  rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator>=(const reverse_iterator<Iter1>& lhs, const reverse_iterator<Iter2>& rhs)	{return lhs.base() <= rhs.base();}
+	
+	template<class Iterator> inline reverse_iterator<Iterator> 
 	operator+ (typename reverse_iterator<Iterator>::difference_type n, const reverse_iterator<Iterator>& rev_it) {return rev_it + n;}
 	
-	template< class Iterator1, class Iterator2 > typename reverse_iterator<Iterator1>::difference_type
+	template< class Iterator1, class Iterator2 > inline typename reverse_iterator<Iterator1>::difference_type
     operator-( const reverse_iterator<Iterator1>& lhs, const reverse_iterator<Iterator2>& rhs ) {return rhs.base() - lhs.base();}
 	// ---------- End of Reverse iterator
 
 
 	// ---------- Random access iterator
-	template<class T> class random_access_iterator : public iterator<random_access_iterator_tag, T> {
+	template<class T>
+	class random_access_iterator : public iterator<random_access_iterator_tag, T> {
 		public:
 			using typename iterator<random_access_iterator_tag, T>::value_type;
 			using typename iterator<random_access_iterator_tag, T>::difference_type;
@@ -146,22 +153,68 @@ namespace ft
 			random_access_iterator		operator-(difference_type n) const {return _ptr - n;}
 	};
 
-	template<class Iter1, class Iter2> bool operator==(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() == rhs.base();}
-	template<class Iter1, class Iter2> bool operator!=(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() != rhs.base();}
-	template<class Iter1, class Iter2> bool operator<(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() <  rhs.base();}
-	template<class Iter1, class Iter2> bool operator<=(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() <= rhs.base();}
-	template<class Iter1, class Iter2> bool operator>(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() >  rhs.base();}
-	template<class Iter1, class Iter2> bool operator>=(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() >= rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator==(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() == rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator!=(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() != rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator<(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() <  rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator<=(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() <= rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator>(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() >  rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator>=(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() >= rhs.base();}
 	
-	template<class Iterator> random_access_iterator<Iterator> 
+	template<class Iterator> inline random_access_iterator<Iterator> 
 	operator+ (typename random_access_iterator<Iterator>::difference_type n, const random_access_iterator<Iterator>& rev_it) {return rev_it + n;}
 	
-	template<class Iter1, class Iter2> typename random_access_iterator<Iter1>::difference_type
+	template<class Iter1, class Iter2> inline typename random_access_iterator<Iter1>::difference_type
 	operator- (const random_access_iterator<Iter1>& lhs,const random_access_iterator<Iter2>& rhs) {return lhs.base() - rhs.base();}
 	// ---------- End of Random access iterator
 
 
+	// ---------- RB Tree iterator
+	template<typename T>
+	class RBTree_iterator {
+		public:
+			typedef T										value_type;
+			typedef T*										pointer;
+			typedef T&										reference;
+			typedef bidirectional_iterator_tag				iterator_category;
+			typedef ptrdiff_t								difference_type;
+			
+		protected:
+			Node<T>*										_node;
+		
+		public:
+			RBTree_iterator() 							: _node(NULL) {}
+			explicit RBTree_iterator(Node<T>* node) 	: _node(node) {}
+			RBTree_iterator(const RBTree_iterator& src) : _node(src._node) {}
+			virtual ~RBTree_iterator() {}
+			
+			RBTree_iterator& operator=(const RBTree_iterator& src) {
+				if (this != &src) {
+					_node = src._node;
+					_root = src._root;
+					_nil = src._nil;
+				}
+				return *this;
+			}
 
+			operator RBTree_iterator<const value_type>() const {return RBTree_iterator<const value_type>(_node);}
+
+			pointer						base() const {return _node;}
+			pointer						operator->() const {return _node;}
+			reference					operator*() const {return _node->value;}
+			reference 					operator[](difference_type n) const {return _node[n];}
+
+			RBTree_iterator& 			operator++() {_node = _node->next(); return *this;}
+			RBTree_iterator& 			operator--() {_node = _node->prev(); return *this;}
+			RBTree_iterator				operator++(int) {RBTree_iterator tmp(*this); _node = _node->next(); return tmp; }
+			RBTree_iterator				operator--(int) {RBTree_iterator tmp(*this); _node = _node->prev(); return tmp; }
+			
+			friend bool					operator==(const RBTree_iterator& rhs) const {return _node == rhs._node;}
+			friend bool					operator!=(const RBTree_iterator& rhs) const {return _node != rhs._node;}	
+	};
+
+	template<typename T> inline bool operator==(const RBTree_iterator<T>& lhs, const RBTree_iterator<T>& rhs) {return lhs.base() == rhs.base();}
+	template<typename T> inline bool operator!=(const RBTree_iterator<T>& lhs, const RBTree_iterator<T>& rhs) {return lhs.base() != rhs.base();}
+	// ---------- End of RB tree iterator
 
 
 	// utility functions

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   rbt_test.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
+/*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/19 17:59:27 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/01/20 15:28:09 by kennyduong       ###   ########.fr       */
+/*   Updated: 2023/01/26 17:42:01 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,40 +30,7 @@ using namespace std;
 		public :
 			RBtree() : root(NULL) {}
 
-			void insert() {
-				int z;
-				cout<<"\nEnter key of the node to be inserted: "; cin>>z;
-				node *p,*q;
-				node *t=new node;
-				t->key=z;
-				t->left=NULL;
-				t->right=NULL;
-				t->color='r';
-				p=root;
-				q=NULL;
-				if(root==NULL)
-				{
-					root=t;
-					t->parent=NULL;
-				}
-				else
-				{
-					while(p!=NULL)
-					{
-						q=p;
-						if(p->key<t->key)
-							p=p->right;
-						else
-							p=p->left;
-					}
-					t->parent=q;
-					if(q->key<t->key)
-						q->right=t;
-					else
-						q->left=t;
-				}
-				insertfix(t);
-			}
+			void 			insert();
 			void 			insertfix(node *);
 			void 			leftrotate(node *);
 			void 			rightrotate(node *);
@@ -74,6 +41,41 @@ using namespace std;
 			void 			search();
 			node* 			successor(node *);
 	};
+
+	void RBtree::insert() {
+		int z;
+		cout<<"\nEnter key of the node to be inserted: "; cin>>z;
+		node *p,*q;
+		node *t=new node;
+		t->key=z;
+		t->left=NULL;
+		t->right=NULL;
+		t->color='r';
+		p=root;
+		q=NULL;
+		if(root==NULL)
+		{
+			root=t;
+			t->parent=NULL;
+		}
+		else
+		{
+			while(p!=NULL)
+			{
+				q=p;
+				if(p->key<t->key)
+					p=p->right;
+				else
+					p=p->left;
+			}
+			t->parent=q;
+			if(q->key<t->key)
+				q->right=t;
+			else
+				q->left=t;
+		}
+		insertfix(t);
+	}
 
 	void RBtree::insertfix(node *t)
 	{
