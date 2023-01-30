@@ -6,23 +6,17 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 15:17:18 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/01/26 19:03:10 by chduong          ###   ########.fr       */
+/*   Updated: 2023/01/28 05:34:34 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef ITERATOR_HPP
 # define ITERATOR_HPP
 # include <cstddef>
-# include "RBTree.hpp"
+# include <iterator>
 
 namespace ft 
 {
-	struct input_iterator_tag { };
-	struct output_iterator_tag { };
-	struct forward_iterator_tag : public input_iterator_tag { };
-	struct bidirectional_iterator_tag : public forward_iterator_tag { };
-	struct random_access_iterator_tag : public bidirectional_iterator_tag { };
-	
 	template<class Category, class T, class Distance = ptrdiff_t, class Pointer = T*, class Reference = T&>
 	struct iterator {
 		typedef Category									iterator_category;
@@ -41,7 +35,7 @@ namespace ft
 	};
 
 	template<class T> struct iterator_traits<T*> {
-		typedef random_access_iterator_tag					iterator_category;
+		typedef std::random_access_iterator_tag				iterator_category;
 		typedef T											value_type;
 		typedef ptrdiff_t									difference_type;
 		typedef T*											pointer;
@@ -49,7 +43,7 @@ namespace ft
 	};
 	
 	template<class T> struct iterator_traits<const T*> {
-		typedef random_access_iterator_tag					iterator_category;
+		typedef std::random_access_iterator_tag				iterator_category;
 		typedef T											value_type;
 		typedef ptrdiff_t									difference_type;
 		typedef const T*									pointer;
@@ -113,13 +107,13 @@ namespace ft
 
 	// ---------- Random access iterator
 	template<class T>
-	class random_access_iterator : public iterator<random_access_iterator_tag, T> {
+	class random_access_iterator : public iterator<std::random_access_iterator_tag, T> {
 		public:
-			using typename iterator<random_access_iterator_tag, T>::value_type;
-			using typename iterator<random_access_iterator_tag, T>::difference_type;
-			using typename iterator<random_access_iterator_tag, T>::pointer;
-			using typename iterator<random_access_iterator_tag, T>::reference;
-			using typename iterator<random_access_iterator_tag, T>::iterator_category;
+			typedef typename iterator<std::random_access_iterator_tag, T>::value_type				value_type;
+			typedef typename iterator<std::random_access_iterator_tag, T>::difference_type			difference_type;
+			typedef typename iterator<std::random_access_iterator_tag, T>::pointer					pointer;
+			typedef typename iterator<std::random_access_iterator_tag, T>::reference					reference;
+			typedef typename iterator<std::random_access_iterator_tag, T>::iterator_category			iterator_category;
 
 		protected:
 			pointer														_ptr;
@@ -168,59 +162,10 @@ namespace ft
 	// ---------- End of Random access iterator
 
 
-	// ---------- RB Tree iterator
-	template<typename T>
-	class RBTree_iterator {
-		public:
-			typedef T										value_type;
-			typedef T*										pointer;
-			typedef T&										reference;
-			typedef bidirectional_iterator_tag				iterator_category;
-			typedef ptrdiff_t								difference_type;
-			
-		protected:
-			Node<T>*										_node;
-		
-		public:
-			RBTree_iterator() 							: _node(NULL) {}
-			explicit RBTree_iterator(Node<T>* node) 	: _node(node) {}
-			RBTree_iterator(const RBTree_iterator& src) : _node(src._node) {}
-			virtual ~RBTree_iterator() {}
-			
-			RBTree_iterator& operator=(const RBTree_iterator& src) {
-				if (this != &src) {
-					_node = src._node;
-					_root = src._root;
-					_nil = src._nil;
-				}
-				return *this;
-			}
-
-			operator RBTree_iterator<const value_type>() const {return RBTree_iterator<const value_type>(_node);}
-
-			pointer						base() const {return _node;}
-			pointer						operator->() const {return _node;}
-			reference					operator*() const {return _node->value;}
-			reference 					operator[](difference_type n) const {return _node[n];}
-
-			RBTree_iterator& 			operator++() {_node = _node->next(); return *this;}
-			RBTree_iterator& 			operator--() {_node = _node->prev(); return *this;}
-			RBTree_iterator				operator++(int) {RBTree_iterator tmp(*this); _node = _node->next(); return tmp; }
-			RBTree_iterator				operator--(int) {RBTree_iterator tmp(*this); _node = _node->prev(); return tmp; }
-			
-			friend bool					operator==(const RBTree_iterator& rhs) const {return _node == rhs._node;}
-			friend bool					operator!=(const RBTree_iterator& rhs) const {return _node != rhs._node;}	
-	};
-
-	template<typename T> inline bool operator==(const RBTree_iterator<T>& lhs, const RBTree_iterator<T>& rhs) {return lhs.base() == rhs.base();}
-	template<typename T> inline bool operator!=(const RBTree_iterator<T>& lhs, const RBTree_iterator<T>& rhs) {return lhs.base() != rhs.base();}
-	// ---------- End of RB tree iterator
-
-
 	// utility functions
 	template<typename Iterator>
-	std::ptrdiff_t distance(Iterator first, Iterator last) {
-		std::ptrdiff_t dist = 0;
+	typename iterator_traits<Iterator>::difference_type distance(Iterator first, Iterator last) {
+		typename iterator_traits<Iterator>::difference_type dist = 0;
 		while (first != last) {
 			++dist;
 			++first;

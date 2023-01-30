@@ -6,13 +6,14 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 18:56:26 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/01/24 14:07:26 by chduong          ###   ########.fr       */
+/*   Updated: 2023/01/28 05:33:58 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
 # include <memory>
+# include <stdexcept>
 # include "utility.hpp"
 # include "iterator.hpp"
 # include "algorithm.hpp"
@@ -50,7 +51,7 @@ namespace ft {
 		explicit vector(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) : _alloc(alloc), _data(NULL), _capacity(n), _size(n) {
 			_data = _alloc.allocate(n);
 			for (size_type i = 0; i < n; i++)
-			_alloc.construct(_data + i, val);
+				_alloc.construct(_data + i, val);
 		}
 
 		// Constructs a container with as many elements as the range [first,last), with each element constructed from its corresponding element in that range, in the same order.
@@ -256,13 +257,13 @@ namespace ft {
 		void clear() {
 			if (_size > 0) {
 				for (iterator it = begin(); it != end(); it++)
-				_alloc.destroy(&(*it));
+					_alloc.destroy(&(*it));
 				_size = 0;
 			}
 		}
 
 		// Allocator
-		allocator_type get_allocator() const {return (Alloc(_alloc));}
+		allocator_type get_allocator() const {return _alloc;}
 	};
 
 	// Non-member function overloads

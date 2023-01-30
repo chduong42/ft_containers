@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 22:09:12 by chduong           #+#    #+#             */
-/*   Updated: 2023/01/26 19:16:07 by chduong          ###   ########.fr       */
+/*   Updated: 2023/01/30 19:31:59 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ namespace ft
 			typedef Alloc																allocator_type;
 			typedef ft::RBTree<key_type, value_type, key_compare, allocator_type> 		tree_type;					
 			
-			typedef typename value_type&												reference;
-			typedef typename const value_type&											const_reference;
+			typedef value_type&															reference;
+			typedef const value_type&													const_reference;
 			typedef typename Alloc::pointer												pointer;
 			typedef typename Alloc::const_pointer 										const_pointer;
 			typedef typename tree_type::iterator										iterator;
@@ -55,6 +55,7 @@ namespace ft
 		
 		private:
 			// ====================== Member Variables ========================= //
+			
 			tree_type					_tree;
 			key_compare					_comp;
 			allocator_type				_alloc;
@@ -99,7 +100,7 @@ namespace ft
 			// Capacity
 			bool 									empty() const { return _tree.empty(); }
 			size_type 								size() const { return _tree.size(); }
-			size_type 								max_size() const { return _tree.max_size}
+			size_type 								max_size() const { return _tree.max_size;}
 			
 			// Modifiers
 			pair<iterator,bool> 					insert(const value_type& val) { return _tree.insert(val); }
