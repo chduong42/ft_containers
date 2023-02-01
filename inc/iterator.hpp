@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 15:17:18 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/01/28 05:34:34 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/01 20:46:58 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,8 +112,8 @@ namespace ft
 			typedef typename iterator<std::random_access_iterator_tag, T>::value_type				value_type;
 			typedef typename iterator<std::random_access_iterator_tag, T>::difference_type			difference_type;
 			typedef typename iterator<std::random_access_iterator_tag, T>::pointer					pointer;
-			typedef typename iterator<std::random_access_iterator_tag, T>::reference					reference;
-			typedef typename iterator<std::random_access_iterator_tag, T>::iterator_category			iterator_category;
+			typedef typename iterator<std::random_access_iterator_tag, T>::reference				reference;
+			typedef typename iterator<std::random_access_iterator_tag, T>::iterator_category		iterator_category;
 
 		protected:
 			pointer														_ptr;
@@ -161,6 +161,55 @@ namespace ft
 	operator- (const random_access_iterator<Iter1>& lhs,const random_access_iterator<Iter2>& rhs) {return lhs.base() - rhs.base();}
 	// ---------- End of Random access iterator
 
+	// ---------- bidirectional iterator
+	template<typename T, typename node_type>
+	class bidirectional_iterator : public iterator<std::bidirectional_iterator_tag, T> {
+		public:
+			typedef typename iterator<std::bidirectional_iterator_tag, T>::value_type				value_type;
+			typedef typename iterator<std::bidirectional_iterator_tag, T>::difference_type			difference_type;
+			typedef typename iterator<std::bidirectional_iterator_tag, T>::pointer					pointer;
+			typedef typename iterator<std::bidirectional_iterator_tag, T>::reference				reference;
+			typedef typename iterator<std::bidirectional_iterator_tag, T>::iterator_category 		iterator_category;
+			typedef node_type* 																		NodePtr;
+			
+		protected:
+			NodePtr										_node;
+			
+		public:
+			bidirectional_iterator() 									: _node(NULL) {}
+			explicit bidirectional_iterator(Node<T>* node) 				: _node(node) {}
+			bidirectional_iterator(const bidirectional_iterator& src) 	: _node(src._node) {}
+			virtual ~bidirectional_iterator() {}
+			
+			bidirectional_iterator& operator=(const bidirectional_iterator& src) {
+				if (this != &src)
+					_node = src._node;
+				return *this;
+			}
+
+			operator bidirectional_iterator<const value_type>() const {return bidirectional_iterator<const value_type>(_node);}
+
+			pointer						base() const {return &_node->data;}
+			pointer						operator->() {return &_node->data;}
+			reference					operator*() const {return _node->data;}
+
+			bidirectional_iterator& 	operator++() {_node = nextNode(_node); return *this;}
+			bidirectional_iterator& 	operator--() {_node = prevNode(_node); return *this;}
+			bidirectional_iterator		operator++(int) {bidirectional_iterator tmp(*this); ++(*this); return tmp; }
+			bidirectional_iterator		operator--(int) {bidirectional_iterator tmp(*this); --(*this); return tmp; }
+			
+			bool						operator==(const bidirectional_iterator& rhs) const {return _node == rhs.base();}
+			bool						operator!=(const bidirectional_iterator& rhs) const {return _node != rhs.base();}
+	};
+
+	template<class Iter1, class Iter2> 
+	inline bool operator==(const bidirectional_iterator<Iter1, Node<Iter1> >& lhs, const bidirectional_iterator<Iter2,Node<Iter2> >& rhs)	
+	{return lhs.base() == rhs.base();}
+	
+	template<class Iter1, class Iter2> 
+	inline bool operator!=(const bidirectional_iterator<Iter1, Node<Iter1> >& lhs, const bidirectional_iterator<Iter2,Node<Iter2> >& rhs)	
+	{return lhs.base() != rhs.base();}
+	// ---------- End of bidirectional iterator
 
 	// utility functions
 	template<typename Iterator>
@@ -172,7 +221,6 @@ namespace ft
 		}
 		return (dist);
 	}
-
 }
 
 #endif
