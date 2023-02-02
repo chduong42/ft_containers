@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 22:09:12 by chduong           #+#    #+#             */
-/*   Updated: 2023/01/30 19:31:59 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/02 17:58:45 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,38 +54,50 @@ namespace ft
 			};
 		
 		private:
-			// ====================== Member Variables ========================= //
-			
+			// ====================== Member Variables ========================= //			
 			tree_type					_tree;
-			key_compare					_comp;
-			allocator_type				_alloc;
+			key_compare					_key_comp;
+			value_compare				_value_comp;
 			
 		public:
 			// ---------------------- Constructors / Destructor ----------------------- //
-			explicit map(const key_compare& comp = key_compare(), const Alloc& alloc = Alloc()) : _comp(comp), _alloc(alloc) {}
-			
+			explicit map(const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _tree(comp, alloc), _key_comp(comp), _value_comp(comp) {}
 			template <class InputIterator>
-			map(InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const Alloc& alloc = Alloc())
-			: _comp(comp), _alloc(alloc) { _tree.assign(first, last); }
-			
-			map(const map& x) : _tree(x._tree), _comp(x._comp), _alloc(x._alloc) {}
+			map(InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()) : _tree(comp, alloc), _key_comp(comp), _value_comp(comp) { _tree.insert(first, last); }
+			map(const map& x) : _tree(x._tree), _key_comp(x._key_comp), _value_comp(x._value_comp) {}
 			~map() {}
 
 			// ---------------------- Member Functions ----------------------------- //
-			map& operator=(const map& x) {
-				if (this != &x){
-					this->clear();
-					this->swap(x);
-				}
-				return *this;
-			}
+			// Operator
+			map&									operator=(const map& x) { _tree = x._tree; return *this; }
 			
-			allocator_type							get_allocator() const { return _alloc; }
+			// Assignation
+			allocator_type							get_allocator() const { return _tree.get_allocator(); }
 			
 			// Element access
-			mapped_type&							at(const key_type& k) { return _tree.at(k);}
-			const mapped_type&						at(const key_type& k) const { return _tree.at(k);}
-			mapped_type& 							operator[](const key_type& k) { return _tree[k]; }
+			mapped_type&	at(const key_type& k)
+			{
+				iterator it = _tree.find(k);
+				if (it == _tree.end())
+					throw std::out_of_range("map::at");
+				return it->second;
+			}
+			
+			const mapped_type&	at(const key_type& k) const
+			{
+				const_iterator it = _tree.find(k);
+				if (it == _tree.end())
+					throw std::out_of_range("map::at");
+				return it->second;
+			}
+			
+			mapped_type&	operator[](const key_type& k)
+			{
+				iterator it = _tree.find(k);
+				if (it == _tree.end())
+					it = _tree.insert(ft::make_pair(k, mapped_type())).first;
+				return it->second;
+			}
 
 			// Iterators
 			iterator 								begin() { return _tree.begin(); }
@@ -100,7 +112,7 @@ namespace ft
 			// Capacity
 			bool 									empty() const { return _tree.empty(); }
 			size_type 								size() const { return _tree.size(); }
-			size_type 								max_size() const { return _tree.max_size;}
+			size_type 								max_size() const { return _tree.max_size();}
 			
 			// Modifiers
 			pair<iterator,bool> 					insert(const value_type& val) { return _tree.insert(val); }
@@ -109,7 +121,7 @@ namespace ft
 			void 									erase(iterator position) { _tree.erase(position); }
 			size_type 								erase(const key_type& k) { return _tree.erase(k); }
 			void 									erase(iterator first, iterator last) { _tree.erase(first, last); }
-			void 									swap(map& x) {std::swap(_tree, x._tree); std::swap(_comp, x._comp); std::swap(_alloc, x._alloc); }
+			void 									swap(map& x) {_tree.swap(x._tree); }
 			void 									clear() { _tree.clear(); }
 			
 			// Operations
@@ -124,8 +136,8 @@ namespace ft
 			const_iterator 							upper_bound(const key_type& k) const { return _tree.upper_bound(k); }
 			
 			// Observers
-			key_compare 							key_comp() const { return _comp; }
-			value_compare 							value_comp() const { return _comp; }
+			key_compare 							key_comp() const { return  _tree.key_comp(); }
+			value_compare 							value_comp() const { return _tree.value_comp(); }
 			
 			// Non-member function overloads
 			friend bool operator==(const map& lhs, const map& rhs)	{return lhs._tree == rhs._tree;}
