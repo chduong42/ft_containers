@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/19 17:55:11 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/02/02 17:57:30 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/03 18:18:00 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,8 +102,8 @@ namespace ft
 			typedef Node<value_type>*									nodePtr;
 			typedef Compare												key_compare;
 			
-			typedef ft::bidirectional_iterator<value_type, node>		iterator;
-			typedef ft::bidirectional_iterator<const value_type, node>	const_iterator;
+			typedef ft::bidirectional_iterator<value_type>				iterator;
+			typedef ft::bidirectional_iterator<const value_type>		const_iterator;
 			typedef ft::reverse_iterator<iterator>						reverse_iterator;
 			typedef ft::reverse_iterator<const iterator>				const_reverse_iterator;
 
@@ -123,22 +123,7 @@ namespace ft
 				_root = _nil;
 			}
 			
-			template<typename InputIterator>
-			RBTree(InputIterator first, InputIterator last, const Compare& comp = Compare(), const allocator_type& alloc = allocator_type()) : _root(NULL), _nil(NULL), _size(0), _comp(comp), _alloc(alloc) {
-				_nil = _alloc.allocate(1);
-				_alloc.construct(_nil, node(value_type()));
-				_nil->color = BLACK;
-				_root = _nil;
-				insert(first, last);
-			}
-
-			RBTree(const RBTree& x) : _root(NULL), _nil(NULL), _size(0), _comp(x._comp), _alloc(x._alloc) {
-				_nil = _alloc.allocate(1);
-				_alloc.construct(_nil, node(value_type()));
-				_nil->color = BLACK;
-				_root = _nil;
-				insert(x.begin(), x.end());
-			}
+			RBTree(const RBTree& src) {	*this = src;}
 
 			// Destructor
 			~RBTree() {
@@ -148,10 +133,13 @@ namespace ft
 			}
 
 			// Operators
-			RBTree& operator=(const RBTree& x) {
-				if (this != &x) {
+			RBTree& operator=(const RBTree& src) {
+				if (this != &src) {
 					clear();
-					insert(x.begin(), x.end());
+					_comp = src._comp;
+					_alloc = src._alloc;
+					_size = src._size;
+					_root = copyTree(src._root, _nil);
 				}
 				return *this;
 			}
@@ -160,13 +148,13 @@ namespace ft
 			node_allocator 				get_allocator() const {return _alloc;}
 			nodePtr 					getRoot() const {return _root;}
 			nodePtr 					getNil() const {return _nil;}
-			key_compare 				key_comp() const {return _comp;}	
+			key_compare 				key_comp() const {return _comp;}
 
 			// iterators
-			iterator 					begin() {return iterator(minNode(_root), _nil);}
-			const_iterator 				begin() const {return const_iterator(minNode(_root), _nil);}
-			iterator 					end() {return iterator(_nil, _nil);}
-			const_iterator 				end() const {return const_iterator(_nil, _nil);}
+			iterator 					begin() {return iterator(minNode(_root));}
+			const_iterator 				begin() const {return const_iterator(minNode(_root));}
+			iterator 					end() {return iterator(_nil);}
+			const_iterator 				end() const {return const_iterator(_nil);}
 			reverse_iterator 			rbegin() {return reverse_iterator(end());}
 			const_reverse_iterator 		rbegin() const {return const_reverse_iterator(end());}
 			reverse_iterator 			rend() {return reverse_iterator(begin());}
@@ -235,7 +223,7 @@ namespace ft
 			}
 
 			void erase(iterator position) {
-				nodePtr node = position.getNode();
+				nodePtr node = 
 				if (node == _nil)
 					return;
 				_size--;
@@ -372,20 +360,6 @@ namespace ft
 			ft::pair<const_iterator, const_iterator> equal_range(const key_type& k) const {
 				return ft::make_pair(lower_bound(k), upper_bound(k));
 			}
-
-			// Observers
-			key_compare key_comp() const {
-				return _comp;
-			}
-
-			value_compare value_comp() const {
-				return value_compare(_comp);
-			}
-			
-			// Allocator
-			allocator_type get_allocator() const {
-				return _alloc;
-			}
 			
 			// Debug
 			void print(nodePtr x, int level) {
@@ -497,7 +471,7 @@ namespace ft
 							x->parent->color = BLACK;
 							w->left->color = BLACK;
 							rightRotate(x->parent);
-							x = root;
+							x = _root;
 						}
 					}
 				}

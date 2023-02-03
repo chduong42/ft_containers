@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 22:09:12 by chduong           #+#    #+#             */
-/*   Updated: 2023/02/02 17:58:45 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/03 16:11:58 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,7 @@ namespace ft
 			
 			// Observers
 			key_compare 							key_comp() const { return  _tree.key_comp(); }
-			value_compare 							value_comp() const { return _tree.value_comp(); }
+			value_compare 							value_comp() const { return value_comp(_tree.key_comp()); }
 			
 			// Non-member function overloads
 			friend bool operator==(const map& lhs, const map& rhs)	{return lhs._tree == rhs._tree;}
