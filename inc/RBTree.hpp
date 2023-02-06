@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/19 17:55:11 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/02/03 18:18:00 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/06 18:51:04 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ namespace ft
 
 		Node(const T data) : data(data), color(BLACK), parent(NULL), left(NULL), right(NULL) {}
 		Node(const Node& node) : data(node.data), color(node.color), parent(node.parent), left(node.left), right(node.right) {}
+		Node(const T data, Node* parent, Node* left, Node* right, Color color) : data(data), color(color), parent(parent), left(left), right(right) {}
 		~Node() {}
 		Node& operator=(const Node& node) {
 			if(this != &node) {
@@ -46,42 +47,58 @@ namespace ft
 		}
 	};
 
-	template<typename NodePtr>
-	NodePtr minNode(NodePtr node) {
-		while (node->left)
+	// find the node with the minimum key
+	template<class node_ptr>
+	node_ptr minNode(node_ptr node) 
+	{
+		if (node == _nil)
+			return _root;
+		while (node->left != _nil)
 			node = node->left;
 		return node;
 	}
 
-	template<typename NodePtr>
-	NodePtr maxNode(NodePtr node) {
-		while (node->right)
+	// find the node with the maximum key
+	template<class node_ptr>
+	node_ptr maxNode(node_ptr node) 
+	{
+		if (node == _nil)
+			return _root;
+		while (node->right != _nil)
 			node = node->right;
 		return node;
 	}
-	
-	template<typename NodePtr>
-	NodePtr nextNode(NodePtr node) {
-		if (node->right)
-			return minNode(node->right);
-		NodePtr parent = node->parent;
-		while (parent && node == parent->right) {
-			node = parent;
-			parent = parent->parent;
+
+	// find the nextNode of a given node
+	template<class node_ptr>
+	node_ptr nextNode(node_ptr x)	{
+		// if the right subtree is not null the nextNode is the leftmost node in the sright subtree
+		if (x->right != _nil)
+			return minNode(x->right);
+		// else it is the lowest ancestor of x whose left child is also an ancestor of x
+		node_ptr y = x->parent;
+		while (y != NULL && x == y->right)
+		{
+			x = y;
+			y = y->parent;
 		}
-		return parent;
+		return y;
 	}
 
-	template<typename NodePtr>
-	NodePtr prevNode(NodePtr node) {
-		if (node->left)
-			return maxNode(node->left);
-		NodePtr parent = node->parent;
-		while (parent && node == parent->left) {
-			node = parent;
-			parent = parent->parent;
+	// find the prevNode of a given node
+	template<class node_ptr>
+	node_ptr prevNode(node_ptr x)
+	{
+		// if the left subtree is not null the prevNode is the rightmost node in the left subtree
+		if (x->left != _nil)
+			return maxNode(x->left);
+		node_ptr y = x->parent;
+		while (y != NULL && x == y->left)
+		{
+			x = y;
+			y = y->parent;
 		}
-		return parent;
+		return y;
 	}
 
 	template<typename Key, typename T, typename Compare, class Alloc>
@@ -98,8 +115,8 @@ namespace ft
 			typedef size_t												size_type;
 			typedef ptrdiff_t											difference_type;
 			typedef Alloc												allocator_type;
-			typedef Node<value_type>									node;
-			typedef Node<value_type>*									nodePtr;
+			typedef Node<value_type>									node_type;
+			typedef node_type*											node_ptr;
 			typedef Compare												key_compare;
 			
 			typedef ft::bidirectional_iterator<value_type>				iterator;
@@ -108,406 +125,341 @@ namespace ft
 			typedef ft::reverse_iterator<const iterator>				const_reverse_iterator;
 
 		private:
-			nodePtr														_root;
-			nodePtr														_nil;
-			size_type													_size;
+			node_ptr													_root;
+			node_ptr													_nil;
 			key_compare													_comp;
 			node_allocator												_alloc;
+			size_type													_size;
 		
 		public:
-			// Constructors
-			explicit RBTree(const Compare& comp = Compare(), const allocator_type& alloc = allocator_type()) : _root(NULL), _nil(NULL), _size(0), _comp(comp), _alloc(alloc) {
+			RBtree(const key_compare &comp = key_compare(), const allocator_type &alloc = allocator_type()) : _comp(comp), _alloc(alloc), _size(0) {
 				_nil = _alloc.allocate(1);
-				_alloc.construct(_nil, node(value_type()));
-				_nil->color = BLACK;
+				_alloc.construct(_nil, node_type(value_type(), NULL, NULL, NULL, black));
 				_root = _nil;
 			}
-			
-			RBTree(const RBTree& src) {	*this = src;}
 
-			// Destructor
-			~RBTree() {
-				clear();
-				_alloc.destroy(_nil);
-				_alloc.deallocate(_nil, 1);
-			}
+			virtual ~RBtree() {	clear(_root); _alloc.destroy(_nil); _alloc.deallocate(_nil, 1);}
 
-			// Operators
-			RBTree& operator=(const RBTree& src) {
-				if (this != &src) {
-					clear();
-					_comp = src._comp;
-					_alloc = src._alloc;
-					_size = src._size;
-					_root = copyTree(src._root, _nil);
-				}
-				return *this;
-			}
+			node_ptr			getRoot() const { return (this->_root);}
+			node_ptr			getNil() const	{ return (this->_nil);}
+			size_type 			getSize() const { return (this->_size);}
+			size_type 			max_size() const { return (_alloc.max_size());}
 
-			// Accessors
-			node_allocator 				get_allocator() const {return _alloc;}
-			nodePtr 					getRoot() const {return _root;}
-			nodePtr 					getNil() const {return _nil;}
-			key_compare 				key_comp() const {return _comp;}
+			node_ptr insertNode(const value_type &data)
+			{
+				node_ptr node = createNode(data, NULL, _nil, _nil, red)
+				node_ptr y = NULL;
+				node_ptr x = this->_root;
 
-			// iterators
-			iterator 					begin() {return iterator(minNode(_root));}
-			const_iterator 				begin() const {return const_iterator(minNode(_root));}
-			iterator 					end() {return iterator(_nil);}
-			const_iterator 				end() const {return const_iterator(_nil);}
-			reverse_iterator 			rbegin() {return reverse_iterator(end());}
-			const_reverse_iterator 		rbegin() const {return const_reverse_iterator(end());}
-			reverse_iterator 			rend() {return reverse_iterator(begin());}
-			const_reverse_iterator 		rend() const {return const_reverse_iterator(begin());}
-
-			// Capacity
-			bool 						empty() const {return _size == 0;}
-			size_type 					size() const {return _size;}
-			size_type 					max_size() const {return _alloc.max_size();}
-			
-			// Modifiers
-			ft::pair<iterator, bool> insert(const value_type& val) {
-				nodePtr newNode = _alloc.allocate(1);
-				_alloc.construct(newNode, node(val));
-				newNode->left = _nil;
-				newNode->right = _nil;
-				newNode->parent = _nil;
-				newNode->color = RED;
-				_size++;
-				if (_root == _nil) {
-					_root = newNode;
-					_root->color = BLACK;
-					_root->parent = _nil;
-					return ft::make_pair(iterator(_root, _nil), true);
-				}
-				nodePtr parent = _root;
-				while (parent != _nil) {
-					if (_comp(newNode->data, parent->data)) {
-						if (parent->left == _nil) {
-							parent->left = newNode;
-							newNode->parent = parent;
-							break;
-						}
-						parent = parent->left;
-					}
-					else if (_comp(parent->data, newNode->data)) {
-						if (parent->right == _nil) {
-							parent->right = newNode;
-							newNode->parent = parent;
-							break;
-						}
-						parent = parent->right;
-					}
+				while (x != _nil) // find node's natural placement
+				{
+					y = x;
+					if (_comp(get_key_from_val()(node->data), get_key_from_val()(x->data)))
+						x = x->left;
+					else if (_comp(get_key_from_val()(x->data), get_key_from_val()(node->data)))
+						x = x->right;
 					else {
-						_alloc.destroy(newNode);
-						_alloc.deallocate(newNode, 1);
-						_size--;
-						return ft::make_pair(iterator(parent, _nil), false);
+						destoryNode(node);
+						return _nil;
 					}
 				}
-				insertFixup(newNode);
-				return ft::make_pair(iterator(newNode, _nil), true);
-			}
-
-			iterator insert(iterator position, const value_type& val) {
-				(void)position;
-				return insert(val).first;
-			}
-
-			template<typename InputIterator>
-			void insert(InputIterator first, InputIterator last) {
-				while (first != last) {
-					insert(*first);
-					first++;
-				}
-			}
-
-			void erase(iterator position) {
-				nodePtr node = 
-				if (node == _nil)
-					return;
-				_size--;
-				if (node->left != _nil && node->right != _nil) {
-					nodePtr successor = minNode(node->right);
-					node->data = successor->data;
-					node = successor;
-				}
-				nodePtr child = node->left != _nil ? node->left : node->right;
-				if (node->color == BLACK) {
-					node->color = child->color;
-					deleteFixup(node);
-				}
-				if (node->parent == _nil)
-					_root = child;
-				else if (node == node->parent->left)
-					node->parent->left = child;
+				node->parent = y;
+				if (y == NULL)
+					this->_root = node;
+				else if (_comp(get_key_from_val()(node->data), get_key_from_val()(y->data))) // place the new node at it's right placement
+					y->left = node;
 				else
-					node->parent->right = child;
-				child->parent = node->parent;
-				_alloc.destroy(node);
-				_alloc.deallocate(node, 1);
-			}
-
-			size_type erase(const key_type& k) {
-				iterator it = find(k);
-				if (it == end())
-					return 0;
-				erase(it);
-				return 1;
-			}
-
-			void erase(iterator first, iterator last) {
-				while (first != last) {
-					iterator tmp = first;
-					first++;
-					erase(tmp);
+					y->right = node;
+				this->_size++;
+				// if new node is a root node, simply return
+				if (y == NULL)	{
+					node->_color = black;
+					return (this->_root);
 				}
-			}
-
-			void swap(RBTree& x) {
-				nodePtr tmp = _root;
-				_root = x._root;
-				x._root = tmp;
-				tmp = _nil;
-				_nil = x._nil;
-				x._nil = tmp;
-				size_type tmpSize = _size;
-				_size = x._size;
-				x._size = tmpSize;
-			}
-
-			void clear() {
-				erase(begin(), end());
-			}
-
-			// Operations
-			iterator find(const key_type& k) {
-				nodePtr node = _root;
-				while (node != _nil) {
-					if (_comp(k, node->data))
-						node = node->left;
-					else if (_comp(node->data, k))
-						node = node->right;
-					else
-						return iterator(node, _nil);
-				}
-				return end();
-			}
-
-			const_iterator find(const key_type& k) const {
-				nodePtr node = _root;
-				while (node != _nil) {
-					if (_comp(k, node->data))
-						node = node->left;
-					else if (_comp(node->data, k))
-						node = node->right;
-					else
-						return const_iterator(node, _nil);
-				}
-				return end();
-			}
-
-			size_type count(const key_type& k) const {
-				if (find(k) == end())
-					return 0;
-				return 1;
-			}
-
-			iterator lower_bound(const key_type& k) {
-				iterator it = begin();
-				while (it != end()) {
-					if (!_comp(it->first, k))
-						return it;
-					it++;
-				}
-				return it;
-			}
-
-			const_iterator lower_bound(const key_type& k) const {
-				const_iterator it = begin();
-				while (it != end()) {
-					if (!_comp(it->first, k))
-						return it;
-					it++;
-				}
-				return it;
-			}
-
-			iterator upper_bound(const key_type& k) {
-				iterator it = begin();
-				while (it != end()) {
-					if (_comp(k, it->first))
-						return it;
-					it++;
-				}
-				return it;
-			}
-
-			const_iterator upper_bound(const key_type& k) const {
-				const_iterator it = begin();
-				while (it != end()) {
-					if (_comp(k, it->first))
-						return it;
-					it++;
-				}
-				return it;
-			}
-
-			ft::pair<iterator, iterator> equal_range(const key_type& k) {
-				return ft::make_pair(lower_bound(k), upper_bound(k));
-			}
-
-			ft::pair<const_iterator, const_iterator> equal_range(const key_type& k) const {
-				return ft::make_pair(lower_bound(k), upper_bound(k));
+				// if the grandparent is null, simply return
+				if (node->parent->parent == NULL)
+					return (node);
+				// Fix the tree colors
+				fixInsert(node);
+				return (node);
 			}
 			
-			// Debug
-			void print(nodePtr x, int level) {
-				if (x != _nil) {
-					print(x->right, level + 1);
-					for (int i = 0; i < level; i++)
-						std::cout << "   ";
-					std::cout << x->key << std::endl;
-					print(x->left, level + 1);
-				}
+			void 				clear(node_ptr const &node) { clear_helper(node); this->_root = _nil;}
+			bool 				deleteNode(key_type key) {	return (deleteNodeHelper(key)); }
+			node_ptr 			searchNode(key_type k) const { return searchNodeHelper(this->_root, k);}
+
+			void swap(RBtree &x)
+			{
+				node_ptr		tmp_root = _root;
+				node_ptr		tmp_nil = _nil;
+				size_type		tmp_size = _size;
+				
+				this->_root = x._root;
+				x._root = tmp_root;
+
+				this->_nil = x._nil;
+				x._nil = tmp_nil;
+
+				this->_size = x._size;
+				x._size = tmp_size;
 			}
 
-			void print() {
-				print(_root, 0);
+		protected:
+			node_ptr createNode(const value_type& data, node_ptr parent, node_ptr left, node_ptr right, Color color) {
+				node_ptr node = _alloc.allocate(1);
+				_alloc.construct(node, node_type(data, parent, left, right, color));
+				return node;
 			}
+	
+			void destroyNode(node_ptr node) const {	_alloc.destroy(node); _alloc.deallocate(node, 1);}
 			
+			void left_rotate(node_ptr x)
+			{
+				node_ptr y = x->right; // y saves x's right branch
 
-		private:
-			void insertFixup(nodePtr z) {
-				while (z->parent->color == RED) {
-					if (z->parent == z->parent->parent->left) {
-						nodePtr y = z->parent->parent->right;
-						if (y->color == RED) {
-							z->parent->color = BLACK;
-							y->color = BLACK;
-							z->parent->parent->color = RED;
-							z = z->parent->parent;
-						}
-						else {
-							if (z == z->parent->right) {
-								z = z->parent;
-								leftRotate(z);
-							}
-							z->parent->color = BLACK;
-							z->parent->parent->color = RED;
-							rightRotate(z->parent->parent);
-						}
-					}
-					else {
-						nodePtr y = z->parent->parent->left;
-						if (y->color == RED) {
-							z->parent->color = BLACK;
-							y->color = BLACK;
-							z->parent->parent->color = RED;
-							z = z->parent->parent;
-						}
-						else {
-							if (z == z->parent->left) {
-								z = z->parent;
-								rightRotate(z);
-							}
-							z->parent->color = BLACK;
-							z->parent->parent->color = RED;
-							leftRotate(z->parent->parent);
-						}
-					}
-				}
-				_root->color = BLACK;
-			}
-
-			void deleteFixup(nodePtr x) {
-				while (x != _root && x->color == BLACK) {
-					if (x == x->parent->left) {
-						nodePtr w = x->parent->right;
-						if (w->color == RED) {
-							w->color = BLACK;
-							x->parent->color = RED;
-							leftRotate(x->parent);
-							w = x->parent->right;
-						}
-						if (w->left->color == BLACK && w->right->color == BLACK) {
-							w->color = RED;
-							x = x->parent;
-						}
-						else {
-							if (w->right->color == BLACK) {
-								w->left->color = BLACK;
-								w->color = RED;
-								rightRotate(w);
-								w = x->parent->right;
-							}
-							w->color = x->parent->color;
-							x->parent->color = BLACK;
-							w->right->color = BLACK;
-							leftRotate(x->parent);
-							x = _root;
-						}
-					}
-					else {
-						nodePtr w = x->parent->left;
-						if (w->color == RED) {
-							w->color = BLACK;
-							x->parent->color = RED;
-							rightRotate(x->parent);
-							w = x->parent->left;
-						}
-						if (w->right->color == BLACK && w->left->color == BLACK) {
-							w->color = RED;
-							x = x->parent;
-						}
-						else {
-							if (w->left->color == BLACK) {
-								w->right->color = BLACK;
-								w->color = RED;
-								leftRotate(w);
-								w = x->parent->left;
-							}
-							w->color = x->parent->color;
-							x->parent->color = BLACK;
-							w->left->color = BLACK;
-							rightRotate(x->parent);
-							x = _root;
-						}
-					}
-				}
-				x->color = BLACK;
-			}
-
-			void leftRotate(nodePtr x) {
-				nodePtr y = x->right;
-				x->right = y->left;
-				if (y->left != _nil)
+				x->right = y->left; // x's new right child is y's old left child
+				if (y->left != _nil) // if y->left isn't NULL
 					y->left->parent = x;
-				y->parent = x->parent;
-				if (x->parent == _nil)
-					_root = y;
-				else if (x == x->parent->left)
+				y->parent = x->parent; // y is new x so it takes old x's parent
+				if (x->parent == NULL)
+					this->_root = y;
+				else if (x == x->parent->left) // if x was it's parent's left child, y becomes it's new parent's left child
 					x->parent->left = y;
 				else
-					x->parent->right = y;
+					x->parent->right = y; // mirror case
 				y->left = x;
 				x->parent = y;
 			}
 
-			void rightRotate(nodePtr x) {
-				nodePtr y = x->left;
+			void right_rotate(node_ptr x) // mirror case
+			{
+				node_ptr y = x->left;
+
 				x->left = y->right;
 				if (y->right != _nil)
 					y->right->parent = x;
 				y->parent = x->parent;
-				if (x->parent == _nil)
-					_root = y;
-				else if (x == x->parent->right)
-					x->parent->right = y;
-				else
+				if (x->parent == NULL)
+					this->_root = y;
+				else if (x == x->parent->left)
 					x->parent->left = y;
+				else
+					x->parent->right = y;
 				y->right = x;
 				x->parent = y;
+			}
+
+			void fixInsert(node_ptr z)
+			{
+				node_ptr u;
+				while (z->parent->_color == red)
+				{
+					if (z->parent == z->parent->parent->right)  { // parent is gp's right child
+						u = z->parent->parent->left; // uncle is left
+						if (u->_color == red) // if uncle also red
+						{
+							u->_color = black;
+							z->parent->_color = black;
+							z->parent->parent->_color = red;
+							z = z->parent->parent;
+						}
+						else {
+							if (z == z->parent->left) // z is left child
+							{
+								z = z->parent;
+								right_rotate(z); // new z is old parent
+							}
+							z->parent->_color = black;
+							z->parent->parent->_color = red;
+							left_rotate(z->parent->parent);
+						}
+					}
+					else { // parent is gp's left child #mirror_case
+						u = z->parent->parent->right; // uncle
+						if (u->_color == red)	{
+						// mirror case
+							u->_color = black;
+							z->parent->_color = black;
+							z->parent->parent->_color = red;
+							z = z->parent->parent;
+						}
+						else {
+							if (z == z->parent->right)
+							{
+								// mirror case
+								z = z->parent;
+								left_rotate(z);
+							}
+							// mirror case
+							z->parent->_color = black;
+							z->parent->parent->_color = red;
+							right_rotate(z->parent->parent);
+						}
+					}
+					if (z == _root)
+						break;
+				}
+				_root->_color = black; // root is black
+			}
+
+			void rbTransplant(node_ptr u, node_ptr v) // replaces u by v
+			{
+				if (u->parent == NULL)
+					_root = v;
+				else if (u == u->parent->left)
+					u->parent->left = v;
+				else
+					u->parent->right = v;
+				v->parent = u->parent;
+			}
+
+			// fix the rb tree modified by the delete operation
+			void fixDelete(node_ptr x)
+			{
+				node_ptr w;
+
+				while (x != this->_root && x->_color == black)
+				{
+					if (x == x->parent->left) // if x is the left child
+					{
+						w = x->parent->right; // w is x's right brother
+						if (w->_color == red)
+						{
+							w->_color = black;
+							x->parent->_color = red;
+							left_rotate(x->parent); // new parent is w, old parent p became w's left child, p is still x's parent and x->parent->right bacame old w->left
+							w = x->parent->right;
+						}
+
+						if (w->left->_color == black && w->right->_color == black)
+						{
+							w->_color = red;
+							x = x->parent;
+						}
+						else // at least one child is red
+						{
+							if (w->right->_color == black) // left child is red
+							{
+								w->left->_color = black;
+								w->_color = red;
+								right_rotate(w);
+								w = x->parent->right;
+							}
+							w->_color = x->parent->_color;
+							x->parent->_color = black;
+							w->right->_color = black;
+							left_rotate(x->parent);
+							x = _root;
+						}
+					}
+					else // mirror case
+					{
+						w = x->parent->left;
+						if (w->_color == red)
+						{
+							w->_color = black;
+							x->parent->_color = red;
+							right_rotate(x->parent);
+							w = x->parent->left;
+						}
+
+						if (w->left->_color == black && w->right->_color == black)
+						{
+							w->_color = red;
+							x = x->parent;
+						}
+						else
+						{
+							if (w->left->_color == black)
+							{
+								w->right->_color = black;
+								w->_color = red;
+								left_rotate(w);
+								w = x->parent->left;
+							}
+							w->_color = x->parent->_color;
+							x->parent->_color = black;
+							w->left->_color = black;
+							right_rotate(x->parent);
+							x = _root;
+						}
+					}
+				}
+				x->_color = black; // root is black
+			}
+
+			void clear_helper(node_ptr const &node)
+			{
+				// Base case of recursion
+				if (node == _nil)
+					return;
+				// Clear all nodes to the left and right of it
+				clear_helper(node->left);
+				clear_helper(node->right);
+				// Clear the node itself
+				destoryNode(node);
+				_size--;
+			}
+
+			bool deleteNodeHelper(key_type key)
+			{
+				// find the node containing key
+				node_ptr z, x, y;
+
+				z = searchNode(key);
+				if (z == _nil)
+					return false;
+
+				y = z; // y saves the suppressed node's placement
+				color y_og_color = y->_color;
+				if (z->left == _nil) // z only had 1 child whitch is the right one so so it get's replaced by it's child
+				{
+					x = z->right; // x saves the right child's branch
+					rbTransplant(z, z->right);
+				}
+				else if (z->right == _nil) //mirror case
+				{
+					x = z->left;
+					rbTransplant(z, z->left);
+				}
+				else // suppressed node had 2 children and is replaced by the minNode of it's right branch
+				{
+					y = minNode(z->right); // search for the minNode in the right child's branch
+					y_og_color = y->_color;
+					x = y->right; // x saves the minNode's right branch
+					if (y->parent == z) // the minNode is z->right
+						x->parent = y;
+					else
+					{
+						rbTransplant(y, y->right); // replaces the minNode by it's right branch
+						y->right = z->right; // set the new z's right side
+						y->right->parent = y;
+					}
+					rbTransplant(z, y); // replace z by the correct value whitch is y and maintain the tree as a good search tree
+					y->left = z->left; // set the new z's left side
+					y->left->parent = y;
+					y->_color = z->_color; // we keep the old z color
+				}
+				destroyNode(z);
+				_size--;
+				if (y_og_color == black) // fix the lost black color on x
+					fixDelete(x);
+				return true;
+			}
+
+			node_ptr searchNodeHelper(node_ptr node, key_type key) const
+			{
+				if (node == _nil)
+					return _nil;
+				if (key == get_key_from_val()(node->data))
+					return node;
+				if (node != _nil)
+				{
+					if (_comp(key, get_key_from_val()(node->data)))
+						return searchNodeHelper(node->left, key);
+					return searchNodeHelper(node->right, key);
+				}
+				return _nil;
 			}
 	};
 	

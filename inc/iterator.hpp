@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 15:17:18 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/02/03 17:31:54 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/06 17:29:49 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define ITERATOR_HPP
 # include <cstddef>
 # include <iterator>
+# include "RBTree.hpp"
 
 namespace ft 
 {
@@ -201,6 +202,9 @@ namespace ft
 			
 			bool						operator==(const bidirectional_iterator& rhs) const {return _node == rhs.base();}
 			bool						operator!=(const bidirectional_iterator& rhs) const {return _node != rhs.base();}
+
+		private:
+		
 	};
 
 	// template<class Iter1, class Iter2> 
