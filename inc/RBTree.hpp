@@ -6,13 +6,13 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/19 17:55:11 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/02/06 18:51:04 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/08 18:07:45 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef RBTREE_HPP
 # define RBTREE_HPP
-# include<iostream>
+# include <iostream>
 # include <memory>
 # include "utility.hpp"
 # include "iterator.hpp"
@@ -35,6 +35,7 @@ namespace ft
 		Node(const Node& node) : data(node.data), color(node.color), parent(node.parent), left(node.left), right(node.right) {}
 		Node(const T data, Node* parent, Node* left, Node* right, Color color) : data(data), color(color), parent(parent), left(left), right(right) {}
 		~Node() {}
+		
 		Node& operator=(const Node& node) {
 			if(this != &node) {
 				this->data = node.data;
@@ -47,59 +48,91 @@ namespace ft
 		}
 	};
 
-	// find the node with the minimum key
-	template<class node_ptr>
-	node_ptr minNode(node_ptr node) 
-	{
-		if (node == _nil)
-			return _root;
-		while (node->left != _nil)
-			node = node->left;
-		return node;
-	}
+	// ---------- bidirectional iterator
+	template<typename T>
+	class bidirectional_iterator : public iterator<std::bidirectional_iterator_tag, T> {
+		public:
+			typedef typename iterator<std::bidirectional_iterator_tag, T>::value_type				value_type;
+			typedef typename iterator<std::bidirectional_iterator_tag, T>::difference_type			difference_type;
+			typedef typename iterator<std::bidirectional_iterator_tag, T>::pointer					pointer;
+			typedef typename iterator<std::bidirectional_iterator_tag, T>::reference				reference;
+			typedef typename iterator<std::bidirectional_iterator_tag, T>::iterator_category 		iterator_category;
+			typedef Node<value_type> 																node_type;
+			typedef node_type* 																		node_ptr;
+			
+		protected:
+			node_ptr														_node;
 
-	// find the node with the maximum key
-	template<class node_ptr>
-	node_ptr maxNode(node_ptr node) 
-	{
-		if (node == _nil)
-			return _root;
-		while (node->right != _nil)
-			node = node->right;
-		return node;
-	}
+			node_ptr successor(node_ptr node) {
+				if (node->right != NULL) {
+					node = node->right;
+					while (node->left != NULL)
+						node = node->left;
+				}
+				else {
+					node_ptr tmp = node->parent;
+					while (tmp != NULL && node == tmp->right) {
+						node = tmp;
+						tmp = tmp->parent;
+					}
+					node = tmp;
+				}
+				return node;
+			}
 
-	// find the nextNode of a given node
-	template<class node_ptr>
-	node_ptr nextNode(node_ptr x)	{
-		// if the right subtree is not null the nextNode is the leftmost node in the sright subtree
-		if (x->right != _nil)
-			return minNode(x->right);
-		// else it is the lowest ancestor of x whose left child is also an ancestor of x
-		node_ptr y = x->parent;
-		while (y != NULL && x == y->right)
-		{
-			x = y;
-			y = y->parent;
-		}
-		return y;
-	}
+			node_ptr predecessor(node_ptr node) {
+				if (node->left != NULL) {
+					node = node->left;
+					while (node->right != NULL)
+						node = node->right;
+				}
+				else {
+					node_ptr tmp = node->parent;
+					while (tmp != NULL && node == tmp->left) {
+						node = tmp;
+						tmp = tmp->parent;
+					}
+					node = tmp;
+				}
+				return node;
+			}
 
-	// find the prevNode of a given node
-	template<class node_ptr>
-	node_ptr prevNode(node_ptr x)
-	{
-		// if the left subtree is not null the prevNode is the rightmost node in the left subtree
-		if (x->left != _nil)
-			return maxNode(x->left);
-		node_ptr y = x->parent;
-		while (y != NULL && x == y->left)
-		{
-			x = y;
-			y = y->parent;
-		}
-		return y;
-	}
+		public:
+			bidirectional_iterator() 									: _node(NULL) {}
+			explicit bidirectional_iterator(node_ptr node)				: _node(node){}
+			bidirectional_iterator(const bidirectional_iterator& src) 	: _node(src._node) {}
+			virtual ~bidirectional_iterator() {}
+			
+			bidirectional_iterator& operator=(const bidirectional_iterator& src) {
+				if (this != &src)
+					_node = src._node;
+				return *this;
+			}
+
+			operator bidirectional_iterator<const value_type>() const {return bidirectional_iterator<const value_type>(_node);}
+
+			node_ptr					getNode() const {return _node;}
+			reference					operator*() const {return _node->data;}
+			pointer						operator->() const {return &_node->data;}
+
+			bidirectional_iterator& 	operator++() {_node = successor(_node); return *this;}
+			bidirectional_iterator& 	operator--() {_node = predecessor(_node); return *this;}
+			bidirectional_iterator		operator++(int) {bidirectional_iterator tmp(*this); ++(*this); return tmp; }
+			bidirectional_iterator		operator--(int) {bidirectional_iterator tmp(*this); --(*this); return tmp; }
+			
+			bool					operator==(const bidirectional_iterator& rhs) const {return _node == rhs.getNode();}
+			bool					operator!=(const bidirectional_iterator& rhs) const {return _node != rhs.getNode();}
+ 
+	};
+
+	template<class Iterator, class Iter>
+	inline bool operator==(ft::bidirectional_iterator<Iterator> const &lhs, ft::bidirectional_iterator<Iter> const &rhs) 
+	{return (lhs.getNode() == rhs.getNode());}
+	
+	template<class Iterator, class Iter> 
+	inline bool operator!=(ft::bidirectional_iterator<Iterator> const &lhs, ft::bidirectional_iterator<Iter> const &rhs) 
+	{return (lhs.getNode() != rhs.getNode());}
+	// ---------- End of bidirectional iterator
 
 	template<typename Key, typename T, typename Compare, class Alloc>
 	class RBTree {
@@ -132,31 +165,32 @@ namespace ft
 			size_type													_size;
 		
 		public:
-			RBtree(const key_compare &comp = key_compare(), const allocator_type &alloc = allocator_type()) : _comp(comp), _alloc(alloc), _size(0) {
+			RBTree(const key_compare &comp = key_compare(), const allocator_type &alloc = allocator_type()) : _comp(comp), _alloc(alloc), _size(0) {
 				_nil = _alloc.allocate(1);
-				_alloc.construct(_nil, node_type(value_type(), NULL, NULL, NULL, black));
+				_alloc.construct(_nil, node_type(value_type(), NULL, NULL, NULL, BLACK));
 				_root = _nil;
 			}
 
-			virtual ~RBtree() {	clear(_root); _alloc.destroy(_nil); _alloc.deallocate(_nil, 1);}
+			virtual ~RBTree() {	clear(_root); _alloc.destroy(_nil); _alloc.deallocate(_nil, 1);}
 
 			node_ptr			getRoot() const { return (this->_root);}
 			node_ptr			getNil() const	{ return (this->_nil);}
 			size_type 			getSize() const { return (this->_size);}
 			size_type 			max_size() const { return (_alloc.max_size());}
+			key_compare			key_comp() const { return (this->_comp);}
 
 			node_ptr insertNode(const value_type &data)
 			{
-				node_ptr node = createNode(data, NULL, _nil, _nil, red)
+				node_ptr node = createNode(data, NULL, _nil, _nil, RED);
 				node_ptr y = NULL;
 				node_ptr x = this->_root;
 
 				while (x != _nil) // find node's natural placement
 				{
 					y = x;
-					if (_comp(get_key_from_val()(node->data), get_key_from_val()(x->data)))
+					if (_comp(node->data, x->data))
 						x = x->left;
-					else if (_comp(get_key_from_val()(x->data), get_key_from_val()(node->data)))
+					else if (_comp((x->data), (node->data)))
 						x = x->right;
 					else {
 						destoryNode(node);
@@ -166,14 +200,14 @@ namespace ft
 				node->parent = y;
 				if (y == NULL)
 					this->_root = node;
-				else if (_comp(get_key_from_val()(node->data), get_key_from_val()(y->data))) // place the new node at it's right placement
+				else if (_comp(node->data, y->data)) // place the new node at it's right placement
 					y->left = node;
 				else
 					y->right = node;
 				this->_size++;
 				// if new node is a root node, simply return
 				if (y == NULL)	{
-					node->_color = black;
+					node->_color = BLACK;
 					return (this->_root);
 				}
 				// if the grandparent is null, simply return
@@ -188,11 +222,11 @@ namespace ft
 			bool 				deleteNode(key_type key) {	return (deleteNodeHelper(key)); }
 			node_ptr 			searchNode(key_type k) const { return searchNodeHelper(this->_root, k);}
 
-			void swap(RBtree &x)
+			void swap(RBTree &x)
 			{
-				node_ptr		tmp_root = _root;
-				node_ptr		tmp_nil = _nil;
-				size_type		tmp_size = _size;
+				node_ptr	tmp_root = _root;
+				node_ptr	tmp_nil = _nil;
+				size_type	tmp_size = _size;
 				
 				this->_root = x._root;
 				x._root = tmp_root;
@@ -212,6 +246,56 @@ namespace ft
 			}
 	
 			void destroyNode(node_ptr node) const {	_alloc.destroy(node); _alloc.deallocate(node, 1);}
+			
+			// find the node with the minimum key
+			node_ptr minNode(node_ptr node) 
+			{
+				if (node == _nil)
+					return _root;
+				while (node->left != _nil)
+					node = node->left;
+				return node;
+			}
+
+			// find the node with the maximum key
+			node_ptr maxNode(node_ptr node) 
+			{
+				if (node == _nil)
+					return _root;
+				while (node->right != _nil)
+					node = node->right;
+				return node;
+			}
+
+			// find the nextNode of a given node
+			node_ptr nextNode(node_ptr x)	{
+				// if the right subtree is not null the nextNode is the leftmost node in the sright subtree
+				if (x->right != _nil)
+					return minNode(x->right);
+				// else it is the lowest ancestor of x whose left child is also an ancestor of x
+				node_ptr y = x->parent;
+				while (y != NULL && x == y->right)
+				{
+					x = y;
+					y = y->parent;
+				}
+				return y;
+			}
+
+			// find the prevNode of a given node
+			node_ptr prevNode(node_ptr x)
+			{
+				// if the left subtree is not null the prevNode is the rightmost node in the left subtree
+				if (x->left != _nil)
+					return maxNode(x->left);
+				node_ptr y = x->parent;
+				while (y != NULL && x == y->left)
+				{
+					x = y;
+					y = y->parent;
+				}
+				return y;
+			}
 			
 			void left_rotate(node_ptr x)
 			{
@@ -252,15 +336,15 @@ namespace ft
 			void fixInsert(node_ptr z)
 			{
 				node_ptr u;
-				while (z->parent->_color == red)
+				while (z->parent->_color == RED)
 				{
 					if (z->parent == z->parent->parent->right)  { // parent is gp's right child
 						u = z->parent->parent->left; // uncle is left
-						if (u->_color == red) // if uncle also red
+						if (u->_color == RED) // if uncle also RED
 						{
-							u->_color = black;
-							z->parent->_color = black;
-							z->parent->parent->_color = red;
+							u->_color = BLACK;
+							z->parent->_color = BLACK;
+							z->parent->parent->_color = RED;
 							z = z->parent->parent;
 						}
 						else {
@@ -269,18 +353,18 @@ namespace ft
 								z = z->parent;
 								right_rotate(z); // new z is old parent
 							}
-							z->parent->_color = black;
-							z->parent->parent->_color = red;
+							z->parent->_color = BLACK;
+							z->parent->parent->_color = RED;
 							left_rotate(z->parent->parent);
 						}
 					}
 					else { // parent is gp's left child #mirror_case
 						u = z->parent->parent->right; // uncle
-						if (u->_color == red)	{
+						if (u->_color == RED)	{
 						// mirror case
-							u->_color = black;
-							z->parent->_color = black;
-							z->parent->parent->_color = red;
+							u->_color = BLACK;
+							z->parent->_color = BLACK;
+							z->parent->parent->_color = RED;
 							z = z->parent->parent;
 						}
 						else {
@@ -291,15 +375,15 @@ namespace ft
 								left_rotate(z);
 							}
 							// mirror case
-							z->parent->_color = black;
-							z->parent->parent->_color = red;
+							z->parent->_color = BLACK;
+							z->parent->parent->_color = RED;
 							right_rotate(z->parent->parent);
 						}
 					}
 					if (z == _root)
 						break;
 				}
-				_root->_color = black; // root is black
+				_root->_color = BLACK; // root is BLACK
 			}
 
 			void rbTransplant(node_ptr u, node_ptr v) // replaces u by v
@@ -318,36 +402,36 @@ namespace ft
 			{
 				node_ptr w;
 
-				while (x != this->_root && x->_color == black)
+				while (x != this->_root && x->_color == BLACK)
 				{
 					if (x == x->parent->left) // if x is the left child
 					{
 						w = x->parent->right; // w is x's right brother
-						if (w->_color == red)
+						if (w->_color == RED)
 						{
-							w->_color = black;
-							x->parent->_color = red;
+							w->_color = BLACK;
+							x->parent->_color = RED;
 							left_rotate(x->parent); // new parent is w, old parent p became w's left child, p is still x's parent and x->parent->right bacame old w->left
 							w = x->parent->right;
 						}
 
-						if (w->left->_color == black && w->right->_color == black)
+						if (w->left->_color == BLACK && w->right->_color == BLACK)
 						{
-							w->_color = red;
+							w->_color = RED;
 							x = x->parent;
 						}
-						else // at least one child is red
+						else // at least one child is RED
 						{
-							if (w->right->_color == black) // left child is red
+							if (w->right->_color == BLACK) // left child is RED
 							{
-								w->left->_color = black;
-								w->_color = red;
+								w->left->_color = BLACK;
+								w->_color = RED;
 								right_rotate(w);
 								w = x->parent->right;
 							}
 							w->_color = x->parent->_color;
-							x->parent->_color = black;
-							w->right->_color = black;
+							x->parent->_color = BLACK;
+							w->right->_color = BLACK;
 							left_rotate(x->parent);
 							x = _root;
 						}
@@ -355,37 +439,37 @@ namespace ft
 					else // mirror case
 					{
 						w = x->parent->left;
-						if (w->_color == red)
+						if (w->_color == RED)
 						{
-							w->_color = black;
-							x->parent->_color = red;
+							w->_color = BLACK;
+							x->parent->_color = RED;
 							right_rotate(x->parent);
 							w = x->parent->left;
 						}
 
-						if (w->left->_color == black && w->right->_color == black)
+						if (w->left->_color == BLACK && w->right->_color == BLACK)
 						{
-							w->_color = red;
+							w->_color = RED;
 							x = x->parent;
 						}
 						else
 						{
-							if (w->left->_color == black)
+							if (w->left->_color == BLACK)
 							{
-								w->right->_color = black;
-								w->_color = red;
+								w->right->_color = BLACK;
+								w->_color = RED;
 								left_rotate(w);
 								w = x->parent->left;
 							}
 							w->_color = x->parent->_color;
-							x->parent->_color = black;
-							w->left->_color = black;
+							x->parent->_color = BLACK;
+							w->left->_color = BLACK;
 							right_rotate(x->parent);
 							x = _root;
 						}
 					}
 				}
-				x->_color = black; // root is black
+				x->_color = BLACK; // root is BLACK
 			}
 
 			void clear_helper(node_ptr const &node)
@@ -411,7 +495,7 @@ namespace ft
 					return false;
 
 				y = z; // y saves the suppressed node's placement
-				color y_og_color = y->_color;
+				Color y_og_color = y->_color;
 				if (z->left == _nil) // z only had 1 child whitch is the right one so so it get's replaced by it's child
 				{
 					x = z->right; // x saves the right child's branch
@@ -442,7 +526,7 @@ namespace ft
 				}
 				destroyNode(z);
 				_size--;
-				if (y_og_color == black) // fix the lost black color on x
+				if (y_og_color == BLACK) // fix the lost BLACK color on x
 					fixDelete(x);
 				return true;
 			}
@@ -451,11 +535,11 @@ namespace ft
 			{
 				if (node == _nil)
 					return _nil;
-				if (key == get_key_from_val()(node->data))
+				if (key == node->data)
 					return node;
 				if (node != _nil)
 				{
-					if (_comp(key, get_key_from_val()(node->data)))
+					if (_comp(key, node->data))
 						return searchNodeHelper(node->left, key);
 					return searchNodeHelper(node->right, key);
 				}
