@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 23:06:09 by chduong           #+#    #+#             */
-/*   Updated: 2022/12/15 04:18:15 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/10 02:16:56 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ namespace ft
     template <> class is_integral<unsigned short> : public true_type {};
     template <> class is_integral<unsigned int> : public true_type {};
     template <> class is_integral<unsigned long> : public true_type {};
+
 }
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 15:17:18 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/02/08 17:11:01 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/10 02:25:10 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,15 @@
 # include <cstddef>
 # include <iterator>
 
+
 namespace ft 
 {
+	struct input_iterator_tag  {};
+	struct output_iterator_tag {};
+	struct forward_iterator_tag       : public input_iterator_tag         {};
+	struct bidirectional_iterator_tag : public forward_iterator_tag       {};
+	struct random_access_iterator_tag : public bidirectional_iterator_tag {};
+	
 	template<class Category, class T, class Distance = ptrdiff_t, class Pointer = T*, class Reference = T&>
 	struct iterator {
 		typedef Category									iterator_category;
@@ -35,7 +42,7 @@ namespace ft
 	};
 
 	template<class T> struct iterator_traits<T*> {
-		typedef std::random_access_iterator_tag				iterator_category;
+		typedef random_access_iterator_tag					iterator_category;
 		typedef T											value_type;
 		typedef ptrdiff_t									difference_type;
 		typedef T*											pointer;
@@ -43,7 +50,7 @@ namespace ft
 	};
 	
 	template<class T> struct iterator_traits<const T*> {
-		typedef std::random_access_iterator_tag				iterator_category;
+		typedef random_access_iterator_tag					iterator_category;
 		typedef T											value_type;
 		typedef ptrdiff_t									difference_type;
 		typedef const T*									pointer;
@@ -107,13 +114,13 @@ namespace ft
 
 	// ---------- Random access iterator
 	template<class T>
-	class random_access_iterator : public iterator<std::random_access_iterator_tag, T> {
+	class random_access_iterator : public iterator<random_access_iterator_tag, T> {
 		public:
-			typedef typename iterator<std::random_access_iterator_tag, T>::value_type				value_type;
-			typedef typename iterator<std::random_access_iterator_tag, T>::difference_type			difference_type;
-			typedef typename iterator<std::random_access_iterator_tag, T>::pointer					pointer;
-			typedef typename iterator<std::random_access_iterator_tag, T>::reference				reference;
-			typedef typename iterator<std::random_access_iterator_tag, T>::iterator_category		iterator_category;
+			typedef typename iterator<random_access_iterator_tag, T>::value_type				value_type;
+			typedef typename iterator<random_access_iterator_tag, T>::difference_type			difference_type;
+			typedef typename iterator<random_access_iterator_tag, T>::pointer					pointer;
+			typedef typename iterator<random_access_iterator_tag, T>::reference					reference;
+			typedef typename iterator<random_access_iterator_tag, T>::iterator_category			iterator_category;
 
 		protected:
 			pointer														_ptr;
@@ -147,18 +154,18 @@ namespace ft
 			random_access_iterator		operator-(difference_type n) const {return _ptr - n;}
 	};
 
-	template<class Iter1, class Iter2> inline bool operator==(const ft::random_access_iterator<Iter1>& lhs, const ft::random_access_iterator<Iter2>& rhs)	{return lhs.base() == rhs.base();}
-	template<class Iter1, class Iter2> inline bool operator!=(const ft::random_access_iterator<Iter1>& lhs, const ft::random_access_iterator<Iter2>& rhs)	{return lhs.base() != rhs.base();}
-	template<class Iter1, class Iter2> inline bool operator<(const ft::random_access_iterator<Iter1>& lhs, const ft::random_access_iterator<Iter2>& rhs)	{return lhs.base() <  rhs.base();}
-	template<class Iter1, class Iter2> inline bool operator<=(const ft::random_access_iterator<Iter1>& lhs, const ft::random_access_iterator<Iter2>& rhs)	{return lhs.base() <= rhs.base();}
-	template<class Iter1, class Iter2> inline bool operator>(const ft::random_access_iterator<Iter1>& lhs, const ft::random_access_iterator<Iter2>& rhs)	{return lhs.base() >  rhs.base();}
-	template<class Iter1, class Iter2> inline bool operator>=(const ft::random_access_iterator<Iter1>& lhs, const ft::random_access_iterator<Iter2>& rhs)	{return lhs.base() >= rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator==(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() == rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator!=(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() != rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator<(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() <  rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator<=(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() <= rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator>(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() >  rhs.base();}
+	template<class Iter1, class Iter2> inline bool operator>=(const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs)	{return lhs.base() >= rhs.base();}
 	
 	template<class Iterator> inline random_access_iterator<Iterator> 
-	operator+ (typename ft::random_access_iterator<Iterator>::difference_type n, const ft::random_access_iterator<Iterator>& rev_it) {return rev_it + n;}
+	operator+ (typename random_access_iterator<Iterator>::difference_type n, const random_access_iterator<Iterator>& rev_it) {return rev_it + n;}
 	
 	template<class Iter1, class Iter2> inline typename random_access_iterator<Iter1>::difference_type
-	operator- (const ft::random_access_iterator<Iter1>& lhs, const ft::random_access_iterator<Iter2>& rhs) {return lhs.base() - rhs.base();}
+	operator- (const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs) {return lhs.base() - rhs.base();}
 	// ---------- End of Random access iterator
 
 	// utility functions
