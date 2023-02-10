@@ -6,13 +6,12 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/19 17:55:11 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/02/10 02:19:24 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/10 07:09:07 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef RBTREE_HPP
 # define RBTREE_HPP
-# include <iostream>
 # include <memory>
 # include "utility.hpp"
 # include "iterator.hpp"
@@ -21,41 +20,41 @@
 
 namespace ft 
 {
-	enum Color {RED, BLACK};
+	enum Color {red, black};
 
 	template<class T>
-	struct Node {
+	struct RbNode {
 		T				data;
 		Color			color;
-		Node*			parent;
-		Node*			left;
-		Node*			right;
+		RbNode*			parent;
+		RbNode*			left;
+		RbNode*			right;
 
-		Node() : data(), color(BLACK), parent(0), left(0), right(0) {}
-		Node(const T& data) : data(data), color(BLACK), parent(0), left(0), right(0) {}
-		Node(const T& data, Color color, Node* parent, Node* left, Node* right) : data(data), color(color), parent(parent), left(left), right(right) {}
-		Node(const Node& x) : data(x.data), color(x.color), parent(x.parent), left(x.left), right(x.right) {}
-		~Node() {}
+		RbNode() : data(), color(black), parent(0), left(0), right(0) {}
+		RbNode(const T& data) : data(data), color(black), parent(0), left(0), right(0) {}
+		RbNode(const T& data, Color color, RbNode* parent, RbNode* left, RbNode* right) : data(data), color(color), parent(parent), left(left), right(right) {}
+		RbNode(const RbNode& x) : data(x.data), color(x.color), parent(x.parent), left(x.left), right(x.right) {}
+		~RbNode() {}
 
-		static Node* minimum(Node* x) {
+		static RbNode* minimum(RbNode* x) {
 			while (x->left != 0)
 				x = x->left;
 			return x;
 		}
 
-		static const Node* minimum(const Node* x) {
+		static const RbNode* minimum(const RbNode* x) {
 			while (x->left != 0)
 				x = x->left;
 			return x;
 		}
 
-		static Node* maximum(Node* x) {
+		static RbNode* maximum(RbNode* x) {
 			while (x->right != 0) 
 				x = x->right;
 			return x;
 		}
 
-		static const Node* maximum(const Node* x) {
+		static const RbNode* maximum(const RbNode* x) {
 			while (x->right != 0) 
 				x = x->right;
 			return x;
@@ -69,24 +68,23 @@ namespace ft
 		typedef value_type*										pointer;
 		typedef ptrdiff_t										difference_type;
 		typedef std::bidirectional_iterator_tag					iterator_category;
-		typedef Node<value_type>								node_type;
-		typedef node_type*										node_pointer;
+		typedef RbNode<value_type>								Node;
 	
-		node_pointer											node;
+		Node*													node;
 
-		tree_iterator()								: node() {}
-		explicit tree_iterator(node_pointer x)		: node(x) {}
+		tree_iterator()						: node() {}
+		explicit tree_iterator(Node* x)		: node(x) {}
 
-		node_pointer prevNode(node_pointer x) {
-			if (x->color == RED	&& x->parent->parent == x)
+		Node* prevNode(Node* x) {
+			if (x->color == red	&& x->parent->parent == x)
 				x = x->right;
 			else if (x->left != 0) {
-				node_pointer y = x->left;
+				Node* y = x->left;
 				while (y->right != 0)
 					y = y->right;
 				x = y;
 			} else {
-				node_pointer y = x->parent;
+				Node* y = x->parent;
 				while (x == y->left) {
 					x = y;
 					y = y->parent;
@@ -96,13 +94,13 @@ namespace ft
 			return x;
 		}
 
-		node_pointer nextNode(node_pointer x)	{
+		Node* nextNode(Node* x)	{
 			if (x->right != 0) {
 				x = x->right;
 				while (x->left != 0)
 					x = x->left;
 			} else {
-				node_pointer y = x->parent;
+				Node* y = x->parent;
 				while (x == y->right) {
 					x = y;
 					y = y->parent;
@@ -113,12 +111,12 @@ namespace ft
 			return x;
 		}
 
-		reference           operator*() const 							{ return this->node->data; }
-		pointer     	    operator->() const 							{ return &this->node->data; }
-		tree_iterator&		operator++() 								{this->node = nextNode(this->node); return *this;}
-		tree_iterator		operator++(int) 							{tree_iterator tmp = *this; this->node = nextNode(this->node); return tmp;}
-		tree_iterator&		operator--() 								{this->node = prevNode(this->node); return *this;}
-		tree_iterator		operator--(int) 							{tree_iterator tmp = *this;	this->node = prevNode(this->node); return tmp;}
+		reference           operator*() const { return this->node->data; }
+		pointer     	    operator->() const { return &this->node->data; }
+		tree_iterator&		operator++() {this->node = nextNode(this->node); return *this;}
+		tree_iterator		operator++(int)	{tree_iterator tmp = *this; this->node = nextNode(this->node); return tmp;}
+		tree_iterator&		operator--() {this->node = prevNode(this->node); return *this;}
+		tree_iterator		operator--(int) {tree_iterator tmp = *this;	this->node = prevNode(this->node); return tmp;}
 		bool        	    operator==(const tree_iterator& rhs) const 	{return this->node == rhs.node;}
 		bool                operator!=(const tree_iterator& rhs) const 	{return this->node != rhs.node;}
 	};
@@ -129,9 +127,10 @@ namespace ft
 	template<typename T>
 	inline bool operator!=(const tree_iterator<T>& lhs, const tree_iterator<T>& rhs) {return lhs.node != rhs.node;}
 
-	template<typename Key, typename T, typename Compare, class Alloc>
+
+	template<typename Key, typename T, typename KeyOfValue, class Compare, class Alloc = std::allocator<T> >
 	class RBTree {
-		typedef typename Alloc::template rebind<Node<T> >::other		node_allocator;
+		typedef typename Alloc::template rebind<RbNode<T> >::other		node_allocator;
 
 		public:
 			typedef Key													key_type;
@@ -146,8 +145,7 @@ namespace ft
 			
 			typedef size_t												size_type;
 			typedef ptrdiff_t											difference_type;
-			typedef Node<value_type>									node_type;
-			typedef node_type*											node_ptr;
+			typedef RbNode<value_type>									Node;
 			
 			typedef ft::tree_iterator<value_type>						iterator;
 			typedef ft::tree_iterator<const value_type>					const_iterator;
@@ -155,395 +153,565 @@ namespace ft
 			typedef ft::reverse_iterator<const_iterator>				const_reverse_iterator;
 
 		private:
-			node_ptr													_root;
-			node_ptr													_nil;
-			key_compare													_comp;
-			node_allocator												_alloc;
-			size_type													_size;
+			node_allocator												allocator;
+			key_compare													compare;
+			Node														header;
+			size_type													count;
 		
 		public:
-			RBTree(const key_compare &comp = key_compare(), const allocator_type &alloc = allocator_type()) : _comp(comp), _alloc(alloc), _size(0) {
-				_nil = _alloc.allocate(1);
-				_alloc.construct(_nil, node_type());
-				_root = _nil;
+			RBTree() :	allocator(node_allocator()), compare(key_compare()), header(), count(0) {}
+
+			RBTree(const key_compare& comp = key_compare(),	const node_allocator& a = node_allocator())	: allocator(a), compare(comp), header(), count(0) {
+				this->header.color = red;
+				this->header.parent = 0;
+				this->header.left = &this->header;
+				this->header.right = &this->header;
 			}
 
-			virtual ~RBTree() {	clear(_root); _alloc.destroy(_nil); _alloc.deallocate(_nil, 1);}
+			~RBTree() { erase(root()); }
 
-			node_ptr			getRoot() const { return (this->_root);}
-			node_ptr			getNil() const	{ return (this->_nil);}
-			size_type 			getSize() const { return (this->_size);}
-			size_type 			max_size() const { return (_alloc.max_size());}
-			key_compare			key_comp() const { return (this->_comp);}
-
-			// find the node with the minimum key
-			node_ptr minNode(node_ptr node) 
-			{
-				if (node == _nil)
-					return _root;
-				while (node->left != _nil)
-					node = node->left;
-				return node;
-			}
-
-			// find the node with the maximum key
-			node_ptr maxNode(node_ptr node) 
-			{
-				if (node == _nil)
-					return _root;
-				while (node->right != _nil)
-					node = node->right;
-				return node;
-			}
-
-			// find the nextNode of a given node
-			node_ptr nextNode(node_ptr x)	{
-				// if the right subtree is not null the nextNode is the leftmost node in the sright subtree
-				if (x->right != _nil)
-					return minNode(x->right);
-				// else it is the lowest ancestor of x whose left child is also an ancestor of x
-				node_ptr y = x->parent;
-				while (y != NULL && x == y->right)
-				{
-					x = y;
-					y = y->parent;
-				}
-				return y;
-			}
-
-			// find the prevNode of a given node
-			node_ptr prevNode(node_ptr x)
-			{
-				// if the left subtree is not null the prevNode is the rightmost node in the left subtree
-				if (x->left != _nil)
-					return maxNode(x->left);
-				node_ptr y = x->parent;
-				while (y != NULL && x == y->left)
-				{
-					x = y;
-					y = y->parent;
-				}
-				return y;
-			}
-
-			node_ptr insertNode(const value_type &data)
-			{
-				node_ptr node = createNode(data, NULL, _nil, _nil, RED);
-				node_ptr y = NULL;
-				node_ptr x = this->_root;
-
-				while (x != _nil) // find node's natural placement
-				{
-					y = x;
-					if (_comp(node->data.first, x->data.first))
-						x = x->left;
-					else if (_comp(x->data.first, node->data.first))
-						x = x->right;
-					else {
-						destroyNode(node);
-						return _nil;
+			RBTree &operator=(const RBTree& rhs) {
+				if (this != &rhs) {
+					this->clear();
+					this->compare = rhs.key_comp();
+					if (rhs.root() != 0) {
+						this->insertUnique(rhs.begin(), rhs.end());
+						this->leftmost() = minimum(this->root());
+						this->rightmost() = maximum(this->root());
+						this->count = rhs.count;
 					}
 				}
-				node->parent = y;
-				if (y == NULL)
-					this->_root = node;
-				else if (_comp(node->data.first, y->data.first)) // place the new node at it's right placement
-					y->left = node;
-				else
-					y->right = node;
-				this->_size++;
-				// if new node is a root node, simply return
-				if (y == NULL)	{
-					node->color = BLACK;
-					return (this->_root);
-				}
-				// if the grandparent is null, simply return
-				if (node->parent->parent == NULL)
-					return (node);
-				// Fix the tree colors
-				fixInsert(node);
-				return (node);
+				return *this;
 			}
+		
+			allocator_type					getAllocator() const { return allocator_type(); }
+
+			Node* createNode(const value_type& x) {
+				Node* tmp =  allocator.allocate(1);
+				try {
+					getAllocator().construct(&tmp->data, x);
+				} catch (...) {
+					allocator.deallocate(tmp, 1);
+					__throw_exception_again;
+				}
+				return tmp;
+			}
+
+			Node* cloneNode(const Node* x) {
+				Node* tmp = createNode(x->data);
+				tmp->color = x->color;
+				tmp->left = 0;
+				tmp->right = 0;
+				return tmp;
+			}
+
+			void destroyNode(Node* p) {
+				getAllocator().destroy(&p->data);
+				allocator.deallocate(p, 1);
+			}
+
+			Node*&						leftmost() { return this->header.left; }
+			const Node*					leftmost() const { return this->header.left; }
+			Node*& 						rightmost() { return this->header.right; }
+			const Node*					rightmost() const { return this->header.right; }
+			Node*& 						root() { return this->header.parent; }
+			const Node* 				root() const { return this->header.parent; }
+			const_reference 			value(const Node* x) { return x->data; }
+			const Key& 					key(const Node* x) { return KeyOfValue()(value(x)); }
+			Node* 						left(Node* x) { return x->left; }
+			const Node* 				left(const Node* x) const { return x->left; }
+			Node*						right(Node* x) { return x->right; }
+			const Node*					right(const Node* x) const { return x->right; }
+			Node*						minimum(Node* x) { return x->minimum(x); }
+			const Node*					minimum(const Node* x) const { return x->minimum(x); }
+			Node*						maximum(Node* x) { return x->maximum(x); }
+			const Node*					maximum(const Node* x) const { return x->maximum(x); }
+
+			iterator					begin() { return iterator(this->header.left); }
+			const_iterator				begin() const { return const_iterator(this->header.left); }
+			iterator					end() { return iterator(&this->header); }
+			const_iterator				end() const	{ return const_iterator(&this->header); }
+			reverse_iterator			rbegin() { return reverse_iterator(end()); }
+			const_reverse_iterator		rbegin() const { return const_reverse_iterator(end()); }
+			reverse_iterator			rend() { return reverse_iterator(begin()); }
+			const_reverse_iterator		rend() const { return const_reverse_iterator(begin()); }
 			
-			void 				clear(node_ptr const &node) { clear_helper(node); this->_root = _nil;}
-			bool 				deleteNode(key_type key) {	return (deleteNodeHelper(key)); }
-			node_ptr 			searchNode(key_type k) const { return searchNodeHelper(this->_root, k);}
-
-			void swap(RBTree &x)
-			{
-				node_ptr	tmp_root = _root;
-				node_ptr	tmp_nil = _nil;
-				size_type	tmp_size = _size;
-				
-				this->_root = x._root;
-				x._root = tmp_root;
-
-				this->_nil = x._nil;
-				x._nil = tmp_nil;
-
-				this->_size = x._size;
-				x._size = tmp_size;
-			}
-
-		protected:
-			node_ptr createNode(const value_type& data, node_ptr parent, node_ptr left, node_ptr right, Color color) {
-				node_ptr node = _alloc.allocate(1);
-				_alloc.construct(node, node_type(data, parent, left, right, color));
-				return node;
-			}
-	
-			void destroyNode(node_ptr node){	_alloc.destroy(node); _alloc.deallocate(node, 1);}
+			Node*						nodeBegin()	{ return this->header.left; }
+			const Node*					nodeBegin() const { return this->header.left; }
+			Node*						nodeEnd() { return &this->header; }
+			const Node*					nodeEnd() const	{ return &this->header; }
 			
-			void left_rotate(node_ptr x)
-			{
-				node_ptr y = x->right; // y saves x's right branch
-
-				x->right = y->left; // x's new right child is y's old left child
-				if (y->left != _nil) // if y->left isn't NULL
-					y->left->parent = x;
-				y->parent = x->parent; // y is new x so it takes old x's parent
-				if (x->parent == NULL)
-					this->_root = y;
-				else if (x == x->parent->left) // if x was it's parent's left child, y becomes it's new parent's left child
-					x->parent->left = y;
-				else
-					x->parent->right = y; // mirror case
-				y->left = x;
-				x->parent = y;
+			size_type					size() const { return this->count; }
+			size_type					max_size() const { return this->allocator.max_size(); }
+			
+			void	clear() {erase(this->root());
+				this->leftmost() = nodeEnd();
+				this->header.parent = 0;
+				this->rightmost() = nodeEnd();
+				this->count = 0;
 			}
 
-			void right_rotate(node_ptr x) // mirror case
-			{
-				node_ptr y = x->left;
-
-				x->left = y->right;
-				if (y->right != _nil)
-					y->right->parent = x;
-				y->parent = x->parent;
-				if (x->parent == NULL)
-					this->_root = y;
-				else if (x == x->parent->left)
-					x->parent->left = y;
-				else
-					x->parent->right = y;
-				y->right = x;
-				x->parent = y;
-			}
-
-			void fixInsert(node_ptr z)
-			{
-				node_ptr u;
-				while (z->parent->color == RED)
-				{
-					if (z->parent == z->parent->parent->right)  { // parent is gp's right child
-						u = z->parent->parent->left; // uncle is left
-						if (u->color == RED) // if uncle also RED
-						{
-							u->color = BLACK;
-							z->parent->color = BLACK;
-							z->parent->parent->color = RED;
-							z = z->parent->parent;
-						}
-						else {
-							if (z == z->parent->left) // z is left child
-							{
-								z = z->parent;
-								right_rotate(z); // new z is old parent
-							}
-							z->parent->color = BLACK;
-							z->parent->parent->color = RED;
-							left_rotate(z->parent->parent);
-						}
-					}
-					else { // parent is gp's left child #mirror_case
-						u = z->parent->parent->right; // uncle
-						if (u->color == RED)	{
-						// mirror case
-							u->color = BLACK;
-							z->parent->color = BLACK;
-							z->parent->parent->color = RED;
-							z = z->parent->parent;
-						}
-						else {
-							if (z == z->parent->right)
-							{
-								// mirror case
-								z = z->parent;
-								left_rotate(z);
-							}
-							// mirror case
-							z->parent->color = BLACK;
-							z->parent->parent->color = RED;
-							right_rotate(z->parent->parent);
-						}
-					}
-					if (z == _root)
-						break;
+			iterator	find(const Key& k) {
+				Node* x = this->root();
+				while (x != 0) {
+					if (compare(key(x), k))
+						x = right(x);
+					else if (compare(k, key(x)))
+						x = left(x);
+					else if (!compare(key(x), k) && !compare(k, key(x)))
+						return iterator(x);
 				}
-				_root->color = BLACK; // root is BLACK
+				return iterator(this->end());
 			}
 
-			void rbTransplant(node_ptr u, node_ptr v) // replaces u by v
-			{
-				if (u->parent == NULL)
-					_root = v;
-				else if (u == u->parent->left)
-					u->parent->left = v;
-				else
-					u->parent->right = v;
-				v->parent = u->parent;
-			}
-
-			// fix the rb tree modified by the delete operation
-			void fixDelete(node_ptr x)
-			{
-				node_ptr w;
-
-				while (x != this->_root && x->color == BLACK)
-				{
-					if (x == x->parent->left) // if x is the left child
-					{
-						w = x->parent->right; // w is x's right brother
-						if (w->color == RED)
-						{
-							w->color = BLACK;
-							x->parent->color = RED;
-							left_rotate(x->parent); // new parent is w, old parent p became w's left child, p is still x's parent and x->parent->right bacame old w->left
-							w = x->parent->right;
-						}
-
-						if (w->left->color == BLACK && w->right->color == BLACK)
-						{
-							w->color = RED;
-							x = x->parent;
-						}
-						else // at least one child is RED
-						{
-							if (w->right->color == BLACK) // left child is RED
-							{
-								w->left->color = BLACK;
-								w->color = RED;
-								right_rotate(w);
-								w = x->parent->right;
-							}
-							w->color = x->parent->color;
-							x->parent->color = BLACK;
-							w->right->color = BLACK;
-							left_rotate(x->parent);
-							x = _root;
-						}
-					}
-					else // mirror case
-					{
-						w = x->parent->left;
-						if (w->color == RED)
-						{
-							w->color = BLACK;
-							x->parent->color = RED;
-							right_rotate(x->parent);
-							w = x->parent->left;
-						}
-
-						if (w->left->color == BLACK && w->right->color == BLACK)
-						{
-							w->color = RED;
-							x = x->parent;
-						}
-						else
-						{
-							if (w->left->color == BLACK)
-							{
-								w->right->color = BLACK;
-								w->color = RED;
-								left_rotate(w);
-								w = x->parent->left;
-							}
-							w->color = x->parent->color;
-							x->parent->color = BLACK;
-							w->left->color = BLACK;
-							right_rotate(x->parent);
-							x = _root;
-						}
-					}
+			const_iterator	find(const Key& k) const {
+				const Node* x = this->root();
+				while (x != 0) {
+					if (compare(key(x), k))
+						x = right(x);
+					else if (compare(k, key(x)))
+						x = left(x);
+					else if (!compare(key(x), k) && !compare(k, key(x)))
+						return const_iterator(x);
 				}
-				x->color = BLACK; // root is BLACK
+				return this->end();
 			}
 
-			void clear_helper(node_ptr const &node)
-			{
-				// Base case of recursion
-				if (node == _nil)
-					return;
-				// Clear all nodes to the left and right of it
-				clear_helper(node->left);
-				clear_helper(node->right);
-				// Clear the node itself
-				destroyNode(node);
-				_size--;
+			iterator		lower_bound(const Key& k) {
+				Node* x = this->root();
+				Node* y = this->nodeEnd();
+				while (x != 0) {
+					if (!compare(key(x), k))
+						y = x, x = left(x);
+					else 
+						x = right(x);
+				}
+				return iterator(y);
 			}
 
-			bool deleteNodeHelper(key_type key)
-			{
-				// find the node containing key
-				node_ptr z, x, y;
-
-				z = searchNode(key);
-				if (z == _nil)
-					return false;
-
-				y = z; // y saves the suppressed node's placement
-				Color y_og_color = y->color;
-				if (z->left == _nil) // z only had 1 child whitch is the right one so so it get's replaced by it's child
-				{
-					x = z->right; // x saves the right child's branch
-					rbTransplant(z, z->right);
-				}
-				else if (z->right == _nil) //mirror case
-				{
-					x = z->left;
-					rbTransplant(z, z->left);
-				}
-				else // suppressed node had 2 children and is replaced by the minNode of it's right branch
-				{
-					y = minNode(z->right); // search for the minNode in the right child's branch
-					y_og_color = y->color;
-					x = y->right; // x saves the minNode's right branch
-					if (y->parent == z) // the minNode is z->right
-						x->parent = y;
+			const_iterator		lower_bound(const Key& k) const {
+				const Node* x = this->root();
+				const Node* y = this->nodeEnd();
+				while (x != 0) {
+					if (!compare(key(x), k))
+						y = x, x = left(x);
 					else
-					{
-						rbTransplant(y, y->right); // replaces the minNode by it's right branch
-						y->right = z->right; // set the new z's right side
-						y->right->parent = y;
-					}
-					rbTransplant(z, y); // replace z by the correct value whitch is y and maintain the tree as a good search tree
-					y->left = z->left; // set the new z's left side
-					y->left->parent = y;
-					y->color = z->color; // we keep the old z color
+						x = right(x);
 				}
-				destroyNode(z);
-				_size--;
-				if (y_og_color == BLACK) // fix the lost BLACK color on x
-					fixDelete(x);
-				return true;
+				return const_iterator(y);
 			}
 
-			node_ptr searchNodeHelper(node_ptr node, key_type key) const
-			{
-				if (node == _nil)
-					return _nil;
-				if (key == node->data.first)
-					return node;
-				if (node != _nil)
-				{
-					if (_comp(key, node->data.first))
-						return searchNodeHelper(node->left, key);
-					return searchNodeHelper(node->right, key);
+			iterator		upper_bound(const Key& k) {
+				Node* x = this->root();
+				Node* y = this->nodeEnd();
+				while (x != 0) {
+					if (compare(k, key(x)))
+						y = x, x = left(x);
+					else
+						x = right(x);
 				}
-				return _nil;
+				return iterator(y);
 			}
+
+			const_iterator		upper_bound(const Key& k) const {
+				const Node* x = this->root();
+				const Node* y = this->nodeEnd();
+				while (x != 0) {
+					if (compare(k, key(x)))
+						y = x, x = left(x);
+					else
+						x = right(x);
+				}
+				return const_iterator(y);
+			}
+
+			iterator insert(Node* x, Node* p, const value_type& value) {
+				bool insertLeft = (x != 0 || p == nodeEnd()	|| compare(KeyOfValue()(value),	key(p)));
+				Node* z = createNode(value);
+				insertAndRebalance(insertLeft, z, p, this->header);
+				++this->count;
+				return iterator(z);
+			}
+
+			size_type	erase(const Key& key) {
+				iterator ret = this->find(key);
+				if (ret != this->end()) {
+					erase(ret);
+					return 1;
+				}
+				return 0;
+			}
+
+			void	erase(iterator pos) {
+				Node* y = eraseAndRebalance(pos.node, this->header);
+				destroyNode(y);
+				--this->count;
+			}
+
+			void	erase(iterator first, iterator last) {
+				if (first == this->begin() && last == this->end())
+					this->clear();
+				else {
+					while (first != last)
+						erase(first++);
+				}
+			}
+
+			void	erase(Node* x) {
+				while (x != 0) {
+					erase(right(x));
+					Node* y = left(x);
+					destroyNode(x);
+					x = y;
+				}
+			}
+
+			pair<iterator, bool>	insertUnique(const value_type& value) {
+				Node* x =	this->root();
+				Node* y =	this->nodeEnd();
+				bool comp = true;
+
+				while (x != 0) {
+					y = x;
+					comp = compare(KeyOfValue()(value), key(x));
+					x = comp ? left(x) : right(x);
+				}
+				iterator j = iterator(y);
+				if (comp) {
+					if (j == iterator(begin()))
+						return pair<iterator, bool>(insert(x, y, value), true);
+					--j;
+				}
+				if (compare(key(j.node), KeyOfValue()(value)))
+					return pair<iterator, bool>(insert(x, y, value), true);
+				return pair<iterator, bool>(j, false);
+			}
+
+			iterator	insertUnique(iterator hint, const value_type& value) {
+				if (hint.node == this->nodeEnd()) {
+					if (this->count > 0	&& compare(key(this->rightmost()), KeyOfValue()(value)))
+						return insert(0, rightmost(), value);
+					else
+						return insertUnique(value).first;
+				} else if (compare(KeyOfValue()(value),	key(hint.node))) {
+					iterator before = hint;
+					if (hint.node == this->leftmost())
+						return insert(this->leftmost(), this->leftmost(), value);
+					else if (compare(key((--before).node),KeyOfValue()(value))) {
+						if (right(before.node) == 0)
+							return insert(0, before.node, value);
+						else 
+							return insert(hint.node, hint.node, value);
+					} else
+						return insertUnique(value).first;
+				} else if (compare(key(hint.node),KeyOfValue()(value))) {
+						iterator after = hint;
+						if (hint.node == this->rightmost())
+							return insert(0, this->rightmost(), value);
+						else if (compare(KeyOfValue()(value),key((++after).node))) {
+							if (right(hint.node) == 0)
+								return insert (0, hint.node, value);
+							else
+								return insert(after.node, after.node, value);
+						} else
+							return insertUnique(value).first;
+				} else
+					return hint;
+			}
+
+			template<typename InputIt>
+			void	insertUnique(InputIt first, InputIt last) {
+				for (; first != last; ++first)
+					insertUnique(end(), *first);
+			}
+
+			key_compare	key_comp() const{ return compare; }
+
+			void	swap(RBTree& other) {
+				std::swap(this->root(), other.root());
+				std::swap(this->leftmost(), other.leftmost());
+				std::swap(this->rightmost(), other.rightmost());
+				if (this->root() != 0)
+					this->root()->parent = this->nodeEnd();
+				else {
+					this->header.left = &this->header;
+					this->header.right = &this->header;
+				}
+				if (other.root() != 0)
+					other.root()->parent = other.nodeEnd();
+				else {
+					this->header.left = &this->header;
+					this->header.right = &this->header;
+				}
+				std::swap(this->count, other.count);
+				std::swap(this->compare, other.compare);
+			}
+
+		static void	leftRotate(Node*& root, Node* const node) {
+			Node* const y = node->right;
+
+			node->right = y->left;
+			if (y->left != 0)
+				y->left->parent = node;
+			y->parent = node->parent;
+
+			if (node == root)
+				root = y;
+			else if (node == node->parent->left)
+				node->parent->left = y;
+			else
+				node->parent->right = y;
+			y->left = node;
+			node->parent = y;
+		}
+
+		static void	rightRotate(Node*& root, Node* const node) {
+			Node* const y = node->left;
+
+			node->left = y->right;
+			if (y->right != 0)
+				y->right->parent = node;
+			y->parent = node->parent;
+
+			if (node == root)
+				root = y;
+			else if (node == node->parent->right)
+				node->parent->right = y;
+			else 
+				node->parent->left = y;
+			y->right = node;
+			node->parent = y;
+		}
+
+		void	rebalance(Node*& root, Node*& x)
+		{
+			while (x != root && x->parent->color == red) {
+				Node* const grandParent = x->_grandParent;
+
+				if (x->parent == grandParent->left) {
+					Node* const uncle = grandParent->right;
+
+					if (uncle && uncle->color == red) {
+						x->parent->color = black;
+						uncle->color = black;
+						grandParent->color = red;
+						x = grandParent;
+					} else {
+						if (x == x->parent->right) {
+							x = x->parent;
+							leftRotate(root, x);
+						}
+						x->parent->color = black;
+						grandParent->color = red;
+						rightRotate(root, grandParent);
+					}
+				} else {
+					Node* const uncle = grandParent->left;
+					if (uncle && uncle->color == red) {
+						x->parent->color = black;
+						uncle->color = black;
+						grandParent->color = red;
+						x = grandParent;
+					} else {
+						if (x == x->parent->left) {
+							x = x->parent;
+							rightRotate(root, x);
+						}
+						x->parent->color = black;
+						grandParent->color = red;
+						leftRotate(root, grandParent);
+					}
+				}
+			}
+			root->color = black;
+		}
+
+		/**
+		 * @brief
+		 * insert a node in the actual tree and rebalance it
+		 * @param[in] insertLeft bool value
+		 * @param[in] x the node to insert
+		 * @param[in] p x's parent
+		 * @param[in] header header of the tree
+		 * @details
+		 * if insertLeft is true, make x the left child of p
+		 * else make x the right child of p
+		 * if tree is empty, set x as the root (header.parent)
+		 * if p is rightmost or leftmost, update the header
+		 */
+		void	insertAndRebalance(const bool insertLeft, Node* x, Node* p, Node& header)
+		{
+			Node*& root = header.parent;
+			x->parent = p;
+			x->left = 0;
+			x->right = 0;
+			x->color = red;
+
+			if (insertLeft) {
+				p->left = x;
+
+				if (p == &header) {
+					header.parent = x;
+					header.right = x;
+				} else if (p == header.left)
+					header.left = x;
+			} else {
+				p->right = x;
+				if (p == header.right)
+					header.right = x;
+			}
+			rebalance(root, x);
+		}
+
+		/**
+		 * @brief delete a node in the tree and rebalanced it
+		 * @param z the node to delete
+		 * @param header the header of the tree
+		 * @return the node to be deleted
+		 * @details
+		 * first conditions block check z's child
+		 * second conditions block whether link z's successor in place of z
+		 * or rearrange z parent according to z's position in  the tree
+		 * then finally we rebalance the tree
+		 */
+		Node*	eraseAndRebalance(Node* const z, Node& header) {
+			Node*& root = header.parent;
+			Node*& leftmost = header.left;
+			Node*& rightmost = header.right;
+			Node* y = z;
+			Node* x = 0;
+			Node* x_parent = 0;
+
+			if (y->left == 0)
+				x = y->right;
+			else {
+				if (y->right == 0)
+					x = y->left;
+				else {
+					y = y->right;
+					while (y->left != 0)
+						y = y->left;
+					x = y->right;
+				}
+			}
+
+			if (y != z) {
+				z->left->parent = y;
+				y->left = z->left;
+				if (y != z->right) {
+					x_parent = y->parent;
+					if (x)
+						x->parent = y->parent;
+					y->parent->left = x;
+					y->right = z->right;
+					z->right->parent = y;
+				} else
+					x_parent = y;
+				if (root == z)
+					root = y;
+				else if (z->parent->left == z)
+					z->parent->left = y;
+				else
+					z->parent->right = y;
+				y->parent = z->parent;
+				std::swap(y->color, z->color);
+				y = z;
+			} else {
+				x_parent = y->parent;
+				if (x)
+					x->parent = y->parent;
+				if (root == z)
+					root = x;
+				else {
+					if (z->parent->left == z)
+						z->parent->left = x;
+					else
+						z->parent->right = x;
+				}
+				if (leftmost == z) {
+					if (z->right == 0)
+						leftmost = z->parent;
+					else
+						leftmost = minimum(x);
+				}
+				if (rightmost == z) {
+					if (z->left == 0)
+						rightmost = z->parent;
+					else
+						rightmost = maximum(x);
+				}
+			}
+
+			if (y->color != red) {
+				while (x != root && (x == 0 || x->color == black)) {
+					if (x == x_parent->left) {
+						Node* w = x_parent->right;
+						if (w->color == red) {
+							w->color = black;
+							x_parent->color = red;
+							leftRotate(root, x_parent);
+							w = x_parent->right;
+						}
+						if ((w->left == 0 ||
+							w->left->color == black) &&
+							(w->right == 0 ||
+							w->right->color == black)) {
+							w->color = red;
+							x = x_parent;
+							x_parent = x_parent->parent;
+						} else {
+							if (w->right == 0 ||
+								w->right->color == black) {
+								w->left->color = black;
+								w->color = red;
+								rightRotate(root, w);
+								w = x_parent->right;
+							}
+							w->color = x_parent->color;
+							x_parent->color = black;
+							if (w->right)
+								w->right->color = black;
+							leftRotate(root, x_parent);
+							break;
+						}
+					} else {
+						Node* w = x_parent->left;
+						if (w->color == red) {
+							w->color = black;
+							x_parent->color = red;
+							rightRotate(root, x_parent);
+							w = x_parent->left;
+						}
+						if ((w->right == 0 ||
+							w->right->color == black) &&
+							(w->left == 0 ||
+							w->left->color == black)) {
+							w->color = red;
+							x = x_parent;
+							x_parent = x_parent->parent;
+						} else {
+							if (w->left == 0 || w->left->color == black) {
+								w->right->color = black;
+								w->color = red;
+								leftRotate(root, w);
+								w = x_parent->left;
+							}
+							w->color = x_parent->color;
+							x_parent->color = black;
+							if (w->left)
+								w->left->color = black;
+							rightRotate(root, x_parent);
+							break;
+						}
+					}
+				}
+				if (x)
+					x->color = black;
+			}
+			return y;
+		}
 	};
-	
-}
+
+} // namespace ft
 
 #endif
