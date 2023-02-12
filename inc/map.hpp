@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   map.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
+/*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 22:09:12 by chduong           #+#    #+#             */
-/*   Updated: 2023/02/10 07:21:27 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/12 18:55:28 by kennyduong       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,26 +24,6 @@ namespace ft
 	template<class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<ft::pair<const Key, T> > >
 	class map {
 		public:
-			// ====================== Member Types ========================= //
-			typedef Key																								key_type;
-			typedef T																								mapped_type;
-			typedef ft::pair<const key_type, mapped_type>															value_type;
-			typedef Compare																							key_compare;
-			typedef Alloc																							allocator_type;
-			typedef RBTree<key_type, value_type, std::_Select1st<value_type>, key_compare, allocator_type> 			tree_type;		
-			
-			typedef value_type&																						reference;
-			typedef const value_type&																				const_reference;
-			typedef typename Alloc::pointer																			pointer;
-			typedef typename Alloc::const_pointer 																	const_pointer;
-			typedef typename tree_type::iterator																	iterator;
-			typedef typename tree_type::const_iterator																const_iterator;
-			typedef typename tree_type::reverse_iterator															reverse_iterator;
-			typedef typename tree_type::const_reverse_iterator														const_reverse_iterator;
-			typedef typename tree_type::difference_type																difference_type;
-			typedef typename tree_type::size_type																	size_type;
-			typedef typename tree_type::node_ptr																	node_ptr;
-		
 			// ====================== Member Classes ========================= //
 			class value_compare : public std::binary_function<value_type, value_type, bool> {
 				friend class map;
@@ -53,7 +33,26 @@ namespace ft
 				public:
 					bool operator()(const value_type& x, const value_type& y) const { return comp(x.first, y.first); }
 			};
-		
+			
+			// ====================== Member Types ========================= //
+			typedef Key														key_type;
+			typedef T														mapped_type;
+			typedef ft::pair<const key_type, mapped_type>					value_type;
+			typedef Compare													key_compare;
+			typedef Alloc													allocator_type;
+			typedef RBTree<value_type, value_compare, allocator_type> 		tree_type;		
+			typedef value_type&												reference;
+			typedef const value_type&										const_reference;
+			typedef typename Alloc::pointer									pointer;
+			typedef typename Alloc::const_pointer 							const_pointer;
+			typedef typename tree_type::iterator							iterator;
+			typedef typename tree_type::const_iterator						const_iterator;
+			typedef typename tree_type::reverse_iterator					reverse_iterator;
+			typedef typename tree_type::const_reverse_iterator				const_reverse_iterator;
+			typedef typename tree_type::difference_type						difference_type;
+			typedef typename tree_type::size_type							size_type;
+			typedef typename tree_type::node_ptr							node_ptr;
+			
 		private:		
 			tree_type					_tree;
 
@@ -61,12 +60,12 @@ namespace ft
 			// ====================== Member Functions ========================= //
 			map() :	_tree() {};
 			explicit map(const Compare& comp, const Alloc& alloc = Alloc())	  : _tree(RBTree(comp, alloc)) {};
-			explicit map(const map& other) :_tree(RBTree(other.key_comp(), other.get_allocator())) {_tree.insertUnique(other.begin(), other.end());}
+				explicit map(const map& other) :_tree(RBTree(other.key_comp(), other.get_allocator())) {_tree.insert(other.begin(), other.end());}
 			~map() {}
 
 			template<class Iter>
 			map(Iter first, Iter last, const Compare& comp = Compare(), const Alloc& alloc = Alloc(), typename ft::enable_if<!ft::is_integral<Iter>::value>::type* = 0)
-			: _tree(RBTree(comp, alloc)) { _tree.insertUnique(first, last); };
+			: _tree(RBTree(comp, alloc)) {this->insert(first, last);}
 
 			map& operator=( const map& other ) {
 				if (this != &other)
@@ -91,12 +90,12 @@ namespace ft
 
 			// ====================== Iterators ========================= //
 			iterator					begin() { return this->_tree.begin(); }
-			iterator					end() { return this->_tree.end(); }
 			const_iterator				begin() const { return this->_tree.begin(); }
+			iterator					end() { return this->_tree.end(); }
 			const_iterator				end() const { return this->_tree.end(); }
 			reverse_iterator			rbegin() { return this->_tree.rbegin(); }
-			reverse_iterator			rend() { return this->_tree.rend(); }
 			const_reverse_iterator		rbegin() const { return this->_tree.rbegin(); }
+			reverse_iterator			rend() { return this->_tree.rend(); }
 			const_reverse_iterator		rend() const { return this->_tree.rend(); }
 
 			// ====================== Capacity ========================= //

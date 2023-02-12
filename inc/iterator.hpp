@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   iterator.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
+/*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 15:17:18 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/02/10 05:15:30 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/12 15:35:19 by kennyduong       ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define ITERATOR_HPP
 # include <cstddef>
 # include <iterator>
+# include "RBNode.hpp"
 
 namespace ft 
 {
@@ -160,7 +161,7 @@ namespace ft
 	template<class Iter1, class Iter2> inline typename random_access_iterator<Iter1>::difference_type
 	operator- (const random_access_iterator<Iter1>& lhs, const random_access_iterator<Iter2>& rhs) {return lhs.base() - rhs.base();}
 	// ---------- End of Random access iterator
-
+	
 	// utility functions
 	template<typename Iterator>
 	typename iterator_traits<Iterator>::difference_type distance(Iterator first, Iterator last) {
@@ -171,6 +172,41 @@ namespace ft
 		}
 		return (dist);
 	}
+
+	// ---------- Tree iterator
+	template<typename Pair>
+	struct tree_iterator : public std::iterator<std::bidirectional_iterator_tag, Pair> 
+	{
+		typedef Pair											value_type;
+		typedef value_type&										reference;
+		typedef const value_type&								const_reference;
+		typedef value_type*										pointer;
+		typedef const value_type*								const_pointer;
+		typedef ptrdiff_t										difference_type;
+		typedef std::bidirectional_iterator_tag					iterator_category;
+		typedef RbNode<value_type>								Node;
+	
+		Node*													node;
+
+		tree_iterator()							: node(NULL) {}
+		explicit tree_iterator(Node* nod)		: node(nod) {}
+
+		reference           operator*() { return this->node->data; }
+		const_reference	 	operator*() const { return this->node->data; }
+		pointer     	    operator->() { return &this->node->data; }
+		const_pointer	    operator->() const { return &this->node->data; }
+		tree_iterator&		operator++() {node = next_node(node); return *this;}
+		tree_iterator&		operator--() {node = prev_node(node); return *this;}
+		tree_iterator 		operator++(int) {tree_iterator tmp = *this; ++*this; return tmp;}
+		tree_iterator 		operator--(int) {tree_iterator tmp = *this; --*this; return tmp;}
+	};
+
+	template<typename P1, typename P2>
+	inline bool operator==(const tree_iterator<P1>& lhs, const tree_iterator<P2>& rhs) {return lhs.node == rhs.node;}
+	
+	template<typename P1, typename P2>
+	inline bool operator!=(const tree_iterator<P1>& lhs, const tree_iterator<P2>& rhs) {return !(lhs == rhs);}
+	// ---------- End of tree iterator
 }
 
 #endif
