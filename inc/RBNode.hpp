@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   RBNode.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
+/*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/11 18:48:00 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/02/12 16:05:40 by kennyduong       ###   ########.fr       */
+/*   Updated: 2023/02/14 05:27:48 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef RBNODE_HPP
 # define RBNODE_HPP
+# include "utility.hpp"
 
 namespace ft
 {    
@@ -25,9 +26,6 @@ namespace ft
 		RbNode*			left;
 		RbNode*			right;
 
-		static RbNode 	nil;
-
-		RbNode() : data(), color(BLACK), parent(0), left(0), right(0) {}
 		RbNode(const Pair& value) : data(value), color(BLACK), parent(0), left(0), right(0) {}
 		RbNode(const Pair& v, Color c, RbNode* p, RbNode* l, RbNode* r) : data(v), color(c), parent(p), left(l), right(r) {}
 		RbNode(const RbNode& x) : data(x.data), color(x.color), parent(x.parent), left(x.left), right(x.right) {}
@@ -44,51 +42,24 @@ namespace ft
 			return *this;
 		}
 
-		static RbNode* minimum(RbNode* x) {
-			while (x->left != 0)
-				x = x->left;
-			return x;
-		}
-
-		static const RbNode* minimum(const RbNode* x) {
-			while (x->left != 0)
-				x = x->left;
-			return x;
-		}
-
-		static RbNode* maximum(RbNode* x) {
-			while (x->right != 0) 
-				x = x->right;
-			return x;
-		}
-
-		static const RbNode* maximum(const RbNode* x) {
-			while (x->right != 0) 
-				x = x->right;
-			return x;
-		}
-
-		bool is_nil() const {return (this == &nil);}
-		bool is_RED() const {return (this->color == RED);}
-		bool is_BLACK() const {return (this->color == BLACK);}
+		bool is_nil() const {return (color == BLACK && parent == NULL && left == this && right == this);}
+		bool is_red() const {return (this->color == RED);}
+		bool is_black() const {return (this->color == BLACK);}
 		bool is_left() const {return (this->parent->left == this);}
 		bool is_right() const {return (this->parent->right == this);}
 	};
 	
-	template<class Pair>
-	RbNode<Pair> RbNode<Pair>::nil = { Pair(), BLACK, nullptr, &RbNode<Pair>::nil, &RbNode<Pair>::nil };
-
 	template <typename NodePtr>
 	NodePtr min_node(NodePtr ptr) {
-		while (!ptr->_left->is_nil())
-			ptr = ptr->_left;
+		while (!ptr->left->is_nil())
+			ptr = ptr->left;
 		return (ptr);
 	}
 	
 	template <typename NodePtr>
 	NodePtr max_node(NodePtr ptr) {
-		while (!ptr->_right->is_nil())
-			ptr = ptr->_right;
+		while (!ptr->right->is_nil())
+			ptr = ptr->right;
 		return (ptr);
 	}
 
@@ -106,7 +77,7 @@ namespace ft
 	template <typename NodePtr>
 	NodePtr prev_node(NodePtr node) {
 		if (!node->left->is_nil())
-			node = max_node(node->left)
+			node = max_node(node->left);
 		else {
 			while (!node->parent->is_nil() && node == node->parent->left)
 				node = node->parent;
