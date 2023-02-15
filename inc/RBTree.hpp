@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/19 17:55:11 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/02/14 06:03:05 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/15 20:49:12 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 
 namespace ft 
 {
-	template<typename Key, typename Value, class Compare, class Alloc = std::allocator<Value> >
+	template<typename Key, typename Value, class Compare, class Alloc>
 	class RBTree {
 		public:
 			typedef Key													key_type;
@@ -30,7 +30,7 @@ namespace ft
 			typedef Alloc												allocator_type;
 			typedef size_t												size_type;
 			typedef ptrdiff_t											difference_type;
-			typedef RbNode<value_type>									Node;
+			typedef RBNode<value_type>									Node;
 			typedef Node*												node_ptr;
 			typedef typename Alloc::template rebind<Node>::other		node_allocator;
 			
@@ -47,12 +47,12 @@ namespace ft
 			node_allocator												_alloc;
 
 		public:
-			RBTree(const key_compare &comp = key_compare(), const allocator_type &alloc = allocator_type()): _size(0), _comp(comp), _alloc(alloc) {
+			RBTree(const key_compare &comp = , const node_allocator &alloc): _size(0), _comp(comp), _alloc(alloc) {
 				_nil = _alloc.allocate(1);
 				_alloc.construct(_nil, Node(value_type()));
 				_nil->color = BLACK;
-				_nil->left = _nil;
-				_nil->right = _nil;
+				_nil->left = NULL;
+				_nil->right = NULL;
 				_nil->parent = NULL;
 				_root = _nil;
 			}
@@ -72,6 +72,7 @@ namespace ft
 
 			node_ptr 					getRoot() const { return (this->_root); }
 			node_ptr 					getNil() const { return (this->_nil); }
+			key_compare 				getComp() const { return (this->_comp); }
 			size_type 					getSize() const { return (this->_size); }
 			size_type 					max_size() const { return (_alloc.max_size()); }
 			

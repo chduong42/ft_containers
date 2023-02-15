@@ -6,17 +6,13 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 22:09:12 by chduong           #+#    #+#             */
-/*   Updated: 2023/02/14 06:25:01 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/15 20:48:08 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MAP_HPP
 # define MAP_HPP
 # include <memory>
-# include "utility.hpp"
-# include "iterator.hpp"
-# include "algorithm.hpp"
-# include "type_traits.hpp"
 # include "RBTree.hpp"
 
 namespace ft 
@@ -32,6 +28,12 @@ namespace ft
 			typedef Alloc																allocator_type;
 			typedef value_type&															reference;
 			typedef const value_type&													const_reference;
+			typedef typename Alloc::pointer												pointer;
+			typedef typename Alloc::const_pointer 										const_pointer;
+			typedef typename Alloc::difference_type										difference_type;
+			typedef typename Alloc::size_type											size_type;
+			typedef RBNode<value_type>													node_type;
+			typedef node_type*															node_ptr;
 			
 			class value_compare : public std::binary_function<value_type, value_type, bool> {
 				friend class map;
@@ -42,22 +44,18 @@ namespace ft
 					bool operator()(const value_type& x, const value_type& y) const { return comp(x.first, y.first); }
 			};
 			
-			typedef RBTree<key_type, value_type, value_compare, allocator_type> 		tree_type;
-			typedef typename Alloc::pointer												pointer;
-			typedef typename Alloc::const_pointer 										const_pointer;
-			typedef tree_iterator<value_type>											iterator;
-			typedef tree_iterator< value_type>										const_iterator;
+			typedef RBTree<key_type, value_type, value_compare, allocator_type>			tree_type;
+			typedef tree_iterator<value_type, node_type>								iterator;
+			typedef tree_iterator<const value_type, node_type>							const_iterator;
 			typedef ft::reverse_iterator<iterator>										reverse_iterator;
 			typedef ft::reverse_iterator<const_iterator>								const_reverse_iterator;
-			typedef typename tree_type::difference_type									difference_type;
-			typedef typename tree_type::size_type										size_type;
-			typedef typename tree_type::node_ptr										node_ptr;
 			
 		private:		
 			tree_type																	_tree;
 
 		public:
 			// ====================== Member Functions ========================= //
+			map() : _tree(tree_type()) {};
 			explicit map(const Compare& comp, const Alloc& alloc = Alloc())	  : _tree(tree_type(comp, alloc)) {};
 
 			template<class Iter>
@@ -96,10 +94,10 @@ namespace ft
 
 
 			// ====================== Iterators ========================= //
-			iterator					begin() { return iterator(_tree.minimun()); }
-			const_iterator				begin() const { return const_iterator(_tree.minimum()); }
-			iterator					end() { return iterator(_tree.getNil()); }
-			const_iterator				end() const { return const_iterator(_tree.getNil()); }
+			iterator					begin() { return iterator(_tree.minimum(), _tree.getNil()); }
+			const_iterator				begin() const { return const_iterator(_tree.minimum(), _tree.getNil()); }
+			iterator					end() { return iterator(_tree.getNil(), _tree.getNil()); }
+			const_iterator				end() const { return const_iterator(_tree.getNil(), _tree.getNil()); }
 			reverse_iterator			rbegin() { return reverse_iterator(end()); }
 			const_reverse_iterator		rbegin() const { return const_reverse_iterator(end());}
 			reverse_iterator			rend() { return reverse_iterator(begin()); }
@@ -150,14 +148,14 @@ namespace ft
 				node_ptr tmp = _tree.searchTree(k);
 				if (tmp == _tree.getNil())
 					return (end());
-				return iterator(tmp);
+				return iterator(tmp, _tree.getNil());
 			}
 
 			const_iterator find(const key_type &k) const {
 				node_ptr tmp = _tree.searchTree(k);
 				if (tmp == _tree.getNil())
 					return (end());
-				return const_iterator(tmp);
+				return const_iterator(tmp, _tree.getNil());
 			}
 
 			size_type count(const key_type& k) const {
@@ -232,7 +230,7 @@ namespace ft
 
 			// ====================== Observers ========================= //
 			key_compare					key_comp() const { return key_compare(); }
-			value_compare				value_comp() const { return value_compare(); }
+			value_compare				value_comp() const { return this->_tree.getComp(); }
 
 	};
 
