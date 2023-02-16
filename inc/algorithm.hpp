@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   algorithm.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+        */
+/*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 23:06:09 by chduong           #+#    #+#             */
-/*   Updated: 2023/01/12 18:16:35 by kennyduong       ###   ########.fr       */
+/*   Updated: 2023/02/16 18:16:05 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,6 @@ namespace ft
         return (first1 == last1) && (first2 != last2);
     }
 
-    template <class T>
-    void swap ( T& a, T& b ){T c(a); a=b; b=c;}
 }
 
 #endif

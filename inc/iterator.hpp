@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 15:17:18 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/02/15 20:45:56 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/16 17:08:41 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,30 +185,44 @@ namespace ft
 			typedef typename ft::iterator<std::bidirectional_iterator_tag, Pair>::iterator_category			iterator_category;
 	
 			Node*													node;
+			Node*													root;
 			Node*													nil;	
 
-			tree_iterator()									: node(NULL), nil(NULL) {}
-			tree_iterator(Node* _node, Node* _nil)			: node(_node), nil(_nil) {}
-			tree_iterator(const tree_iterator& src)			: node(src.node), nil(src.nil) {}
+			tree_iterator()											: node(NULL), root(NULL), nil(NULL) {}
+			tree_iterator(Node* _node, Node* _root, Node* _nil)		: node(_node), root(_root), nil(_nil) {}
+			tree_iterator(const tree_iterator& src)					: node(src.node), root(src.root), nil(src.nil) {}
 			~tree_iterator() {}
 			
 			tree_iterator& operator=(const tree_iterator& src) {
 				if (this != &src)	{
 					node = src.node;
+					root = src.root;
 					nil = src.nil;
 				}
 				return *this;
 			}
 
-			operator tree_iterator<const value_type, Node>() const { return tree_iterator<const value_type, Node>(node, nil);}
+			operator tree_iterator<const value_type, Node>() const { return tree_iterator<const value_type, Node>(node, root, nil);}
 			
 			bool 				operator==(tree_iterator const &lhs) const {return (this->node == lhs.node);}
 			bool 				operator!=(tree_iterator const &lhs) const {return (this->node != lhs.node);}
 		
 			reference           operator*() const { return this->node->data; }
 			pointer     	    operator->() const { return &this->node->data; }
-			tree_iterator&		operator++() {node = next_node(node, nil); return *this;}
-			tree_iterator&		operator--() {node = prev_node(node, nil); return *this;}
+			
+			tree_iterator&		operator++() {
+				if (node != nil)
+					node = next_node(node, nil);
+				return *this;
+			}
+			
+			tree_iterator&		operator--() {
+				if (node == nil)
+					node = max_node(root, nil);
+				node = prev_node(node, nil);
+				return *this;
+			}
+			
 			tree_iterator 		operator++(int) {tree_iterator tmp = *this; ++*this; return tmp;}
 			tree_iterator 		operator--(int) {tree_iterator tmp = *this; --*this; return tmp;}
 	};

@@ -6,13 +6,14 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/11 18:48:00 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/02/15 18:04:12 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/16 17:43:58 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef RBNode_HPP
 # define RBNode_HPP
 # include "utility.hpp"
+# include <iostream>
 
 namespace ft
 {    
@@ -42,6 +43,7 @@ namespace ft
 			return *this;
 		}
 
+		bool is_nil() const {return (this->parent == NULL);}
 		bool is_left() const {return (this->parent->left == this);}
 		bool is_right() const {return (this->parent->right == this);}
 	};
@@ -85,12 +87,6 @@ namespace ft
 		}
 		return parent;
 	}
-
-	template<class P1, class P2>
-	bool operator==(const RBNode<P1>& lhs, const RBNode<P2>& rhs) {return &lhs == &rhs;}
-
-	template<class P1, class P2>
-	bool operator!=(const RBNode<P1>& lhs, const RBNode<P2>& rhs) {return !(lhs == rhs);}
 
 }
 

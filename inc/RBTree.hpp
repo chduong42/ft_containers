@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/19 17:55:11 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/02/15 20:49:12 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/16 17:53:24 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ namespace ft
 			typedef ptrdiff_t											difference_type;
 			typedef RBNode<value_type>									Node;
 			typedef Node*												node_ptr;
-			typedef typename Alloc::template rebind<Node>::other		node_allocator;
 			
 			typedef value_type*											pointer;
 			typedef const value_type*									const_pointer;
@@ -44,35 +43,28 @@ namespace ft
 			node_ptr													_nil;
 			size_type													_size;
 			key_compare													_comp;
-			node_allocator												_alloc;
+			allocator_type												_alloc;
 
 		public:
-			RBTree(const key_compare &comp = , const node_allocator &alloc): _size(0), _comp(comp), _alloc(alloc) {
+			RBTree(const key_compare &comp = key_compare(), const allocator_type &alloc = allocator_type()) : _size(0), _comp(comp), _alloc(alloc) {
 				_nil = _alloc.allocate(1);
-				_alloc.construct(_nil, Node(value_type()));
-				_nil->color = BLACK;
-				_nil->left = NULL;
-				_nil->right = NULL;
-				_nil->parent = NULL;
+				_alloc.construct(_nil, Node(value_type(), BLACK, NULL, NULL, NULL));
 				_root = _nil;
 			}
 
-			RBTree& operator=(const RBTree &x) {
-				if (this != &x) {
-					_root = x._root;
-					_nil = x._nil;
-					_size = x._size;
-					_comp = x._comp;
-					_alloc = x._alloc;
-				}
-				return *this;
+			RBTree(const RBTree &x) : _size(x._size), _comp(x._comp), _alloc(x._alloc) {
+				_nil = _alloc.allocate(1);
+				_alloc.construct(_nil, Node(value_type(), BLACK, NULL, NULL, NULL));
+				_root = _nil;
+				*this = x;
 			}
 
-			~RBTree() {	clear_h(_root);	_alloc.destroy(_nil); _alloc.deallocate(_nil, 1);}
+			virtual ~RBTree() {}
 
 			node_ptr 					getRoot() const { return (this->_root); }
 			node_ptr 					getNil() const { return (this->_nil); }
 			key_compare 				getComp() const { return (this->_comp); }
+			allocator_type 				getAlloc() const { return (this->_alloc); }
 			size_type 					getSize() const { return (this->_size); }
 			size_type 					max_size() const { return (_alloc.max_size()); }
 			
