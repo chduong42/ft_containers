@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/18 11:51:15 by alilin            #+#    #+#             */
-/*   Updated: 2023/02/17 15:18:40 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/17 16:18:28 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,16 @@
 # include "algorithm.hpp"
 # include "type_traits.hpp"
 # include "RBNode.hpp"
+# include "map.hpp"
 
 namespace ft
 {
-	template <class Key, class T, class get_key_from_val, class Compare = std::less<Key>, class Alloc = std::allocator<RBNode<T> > >
+	template <class Key, class T, class Compare, class Alloc = std::allocator<RBNode<T> > >
 	class RBtree {
 	public:
 		typedef Key 						key_type;
 		typedef T 							value_type;
-		typedef Compare 					key_compare;
+		typedef Compare 					value_compare;
 		typedef Alloc 						allocator_type;
 		typedef size_t 						size_type;
 		typedef RBNode<value_type> 			node_type;
@@ -34,12 +35,12 @@ namespace ft
 	private:
 		node_ptr 							_root;
 		node_ptr 							_nil;
-		key_compare 						_comp;
+		value_compare 						_comp;
 		allocator_type 						_alloc;
 		size_type 							_size;
 
 	public:
-		RBtree(const key_compare &comp = key_compare(), const allocator_type &alloc = allocator_type()): _comp(comp), _alloc(alloc), _size(0)	{
+		RBtree(const value_compare &comp, const allocator_type &alloc = allocator_type()): _comp(comp), _alloc(alloc), _size(0)	{
 			_nil = _alloc.allocate(1);
 			_alloc.construct(_nil, node_type(value_type(), NULL, NULL, NULL, black));
 			_root = _nil;
@@ -142,9 +143,9 @@ namespace ft
 			while (x != _nil) // find node's natural placement
 			{
 				y = x;
-				if (_comp(get_key_from_val()(node->data), get_key_from_val()(x->data)))
+				if (_comp(node->data, x->data))
 					x = x->left;
-				else if (_comp(get_key_from_val()(x->data), get_key_from_val()(node->data)))
+				else if (_comp(x->data, node->data))
 					x = x->right;
 				else	{
 					_alloc.destroy(node);
@@ -155,7 +156,7 @@ namespace ft
 			node->parent = y;
 			if (y == NULL)
 				this->_root = node;
-			else if (_comp(get_key_from_val()(node->data), get_key_from_val()(y->data))) // place the new node at it's right placement
+			else if (_comp(node->data, y->data)) // place the new node at it's right placement
 				y->left = node;
 			else
 				y->right = node;
@@ -410,11 +411,11 @@ namespace ft
 		{
 			if (node == _nil)
 				return _nil;
-			if (key == get_key_from_val()(node->data))
+			if (key == node->data.first)
 				return node;
 			if (node != _nil)
 			{
-				if (_comp(key, get_key_from_val()(node->data)))
+				if (_comp(key, node->data))
 					return searchTreeHelper(node->left, key);
 				return searchTreeHelper(node->right, key);
 			}

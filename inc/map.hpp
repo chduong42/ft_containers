@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 22:09:12 by chduong           #+#    #+#             */
-/*   Updated: 2023/02/17 15:02:19 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/17 16:21:34 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,65 +18,57 @@
 
 namespace ft
 {
-	template <class T, class Key>
-	struct get_key : public std::unary_function<T, Key>
-	{
-		const Key &operator()(const T &x) const
-		{
-			return (x.first);
-		}
-	};
-	
 	template < class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<ft::pair<const Key,T> > >
 	class map {
 		public:
-			typedef Key 													key_type;
-			typedef T 														mapped_type;
-			typedef ft::pair<const key_type, mapped_type> 					value_type;
-			typedef Compare 												key_compare;
-			typedef Alloc 													allocator_type;
-			typedef RBNode<value_type> 										node_type;
-			typedef RBNode<value_type>* 									node_ptr;
+			typedef Key 															key_type;
+			typedef T 																mapped_type;
+			typedef ft::pair<const key_type, mapped_type> 							value_type;
+			typedef Compare 														key_compare;
+			typedef Alloc 															allocator_type;
+			typedef RBNode<value_type> 												node_type;
+			typedef RBNode<value_type>* 											node_ptr;
 			
-			typedef typename allocator_type::reference 						reference;
-			typedef typename allocator_type::const_reference 				const_reference;
-			typedef typename allocator_type::pointer 						pointer;
-			typedef typename allocator_type::const_pointer 					const_pointer;
-			typedef typename allocator_type::difference_type 				difference_type;
-			typedef typename allocator_type::size_type 						size_type;
-
-			typedef ft::tree_iterator<value_type, node_type> 				iterator;
-			typedef ft::tree_iterator<value_type const, node_type const> 	const_iterator;
-			typedef ft::reverse_iterator<iterator> 							reverse_iterator;
-			typedef ft::reverse_iterator<const_iterator> 					const_reverse_iterator;
+			typedef typename allocator_type::reference 								reference;
+			typedef typename allocator_type::const_reference 						const_reference;
+			typedef typename allocator_type::pointer 								pointer;
+			typedef typename allocator_type::const_pointer 							const_pointer;
+			typedef typename allocator_type::difference_type 						difference_type;
+			typedef typename allocator_type::size_type 								size_type;
+			
+			typedef ft::tree_iterator<value_type, node_type> 						iterator;
+			typedef ft::tree_iterator<value_type const, node_type const> 			const_iterator;
+			typedef ft::reverse_iterator<iterator> 									reverse_iterator;
+			typedef ft::reverse_iterator<const_iterator> 							const_reverse_iterator;
 
 			class value_compare : public std::binary_function<value_type, value_type, bool> {
 				friend class map;
 				protected:
-					Compare	comp;
+					Compare						comp;
 					value_compare(Compare c) : comp(c) {}
+					
 				public:
-					bool operator()(const value_type& x, const value_type& y) const { return comp(x.first, y.first); }
-					bool operator()(const value_type& x, const key_type& y)const {return (comp(x.first, y));}
-					bool operator()(const key_type& x, const value_type& y)const {return (comp(x, y.first));}
-					bool operator()(const key_type& x, const key_type& y)const {return (comp(x, y));}
+					bool			operator()(const value_type& x, const value_type& y) const 	{return comp(x.first, y.first);}
+					bool			operator()(const value_type& x, const key_type& y) const 	{return comp(x.first, y);}
+					bool			operator()(const key_type& x, const value_type& y) const 	{return comp(x, y.first);}
+					bool			operator()(const key_type& x, const key_type& y) const		{return comp(x, y);}
 			};
 			
-			typedef ft::RBtree<key_type, value_type, get_key<value_type, key_type>, key_compare> tree_type;
+			typedef RBtree<key_type, value_type, value_compare> 					tree_type;
 
 		private:
-			key_compare														_comp;
-			allocator_type													_alloc;
-			tree_type														_tree;
+			key_compare																_comp;
+			allocator_type															_alloc;
+			tree_type																_tree;
 		
 		public:
-			explicit map(const key_compare &comp = key_compare(), const allocator_type &alloc = allocator_type()): _comp(comp), _alloc(alloc), _tree() {}
+			explicit map(const key_compare &comp = key_compare(), const allocator_type &alloc = allocator_type()): _comp(comp), _alloc(alloc), _tree(value_comp()) {}
 			
 			template <class InputIterator>
 			map(InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
-			: _comp(comp), _alloc(alloc), _tree() { insert(first, last); }
+			: _comp(comp), _alloc(alloc), _tree(value_comp()) { insert(first, last); }
 			
-			map(const map &x): _comp(x._comp), _alloc(x._alloc) {insert(x.begin(), x.end());}
+			map(const map &x): _comp(x._comp), _alloc(x._alloc), _tree(value_comp()) {insert(x.begin(), x.end());}
 			
 			~map() {}
 
@@ -99,11 +91,14 @@ namespace ft
 			const_reverse_iterator		rbegin() const { return const_reverse_iterator(end());}
 			reverse_iterator			rend() { return reverse_iterator(begin());}
 			const_reverse_iterator		rend() const { return const_reverse_iterator(begin());}
+			
 			bool						empty() const { return (_tree.getSize() == 0);}
 			size_type					size() const { return (_tree.getSize());}
 			size_type					max_size() const { return (_tree.max_size());}
+			
 			void 						swap (map &x) {_tree.swap(x._tree);}
 			void 						clear() {_tree.clear_h(_tree.getRoot());}
+			
 			key_compare 				key_comp() const { return (this->_comp); }
 			value_compare 				value_comp() const { return (value_compare(this->_comp));}
 			allocator_type				get_allocator() const { return (_alloc); }
