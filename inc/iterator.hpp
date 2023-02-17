@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 15:17:18 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/02/16 17:08:41 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/17 15:05:53 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,66 +173,115 @@ namespace ft
 		return (dist);
 	}
 
-	// ---------- Tree iterator
-	template<typename Pair, class Node>
-	class tree_iterator : public ft::iterator<std::bidirectional_iterator_tag, Pair> 
-	{
+	template< class T, class N >
+	class tree_iterator	: public std::iterator<std::bidirectional_iterator_tag, T> {
 		public:
-			typedef typename ft::iterator<std::bidirectional_iterator_tag, Pair>::value_type				value_type;
-			typedef typename ft::iterator<std::bidirectional_iterator_tag, Pair>::difference_type			difference_type;
-			typedef typename ft::iterator<std::bidirectional_iterator_tag, Pair>::pointer					pointer;
-			typedef typename ft::iterator<std::bidirectional_iterator_tag, Pair>::reference					reference;
-			typedef typename ft::iterator<std::bidirectional_iterator_tag, Pair>::iterator_category			iterator_category;
-	
-			Node*													node;
-			Node*													root;
-			Node*													nil;	
+			typedef typename ft::iterator<std::bidirectional_iterator_tag, T>::value_type			value_type;
+			typedef typename ft::iterator<std::bidirectional_iterator_tag, T>::difference_type		difference_type;
+			typedef typename ft::iterator<std::bidirectional_iterator_tag, T>::pointer				pointer;
+			typedef typename ft::iterator<std::bidirectional_iterator_tag, T>::reference			reference;
+			typedef typename ft::iterator<std::bidirectional_iterator_tag, T>::iterator_category	iterator_category;
+			typedef const value_type* 																const_pointer;
+			typedef const value_type& 																const_reference;
+			typedef N 																				node_type;
+			typedef node_type*																		node_ptr;
 
-			tree_iterator()											: node(NULL), root(NULL), nil(NULL) {}
-			tree_iterator(Node* _node, Node* _root, Node* _nil)		: node(_node), root(_root), nil(_nil) {}
-			tree_iterator(const tree_iterator& src)					: node(src.node), root(src.root), nil(src.nil) {}
-			~tree_iterator() {}
-			
-			tree_iterator& operator=(const tree_iterator& src) {
-				if (this != &src)	{
-					node = src.node;
-					root = src.root;
-					nil = src.nil;
-				}
-				return *this;
-			}
-
-			operator tree_iterator<const value_type, Node>() const { return tree_iterator<const value_type, Node>(node, root, nil);}
-			
-			bool 				operator==(tree_iterator const &lhs) const {return (this->node == lhs.node);}
-			bool 				operator!=(tree_iterator const &lhs) const {return (this->node != lhs.node);}
+		protected:
+			node_ptr 																				_ptr;
+			node_ptr 																				_root;
+			node_ptr 																				_nil;
 		
-			reference           operator*() const { return this->node->data; }
-			pointer     	    operator->() const { return &this->node->data; }
+		public:
+			tree_iterator() 											: _ptr(NULL), _root(NULL), _nil(NULL) {}
+			tree_iterator(node_ptr ptr, node_ptr root, node_ptr nil) 	: _ptr(ptr), _root(root), _nil(nil) {}
+			tree_iterator(tree_iterator const &lhs) 					: _ptr(lhs._ptr), _root(lhs._root), _nil(lhs._nil) {}
+			virtual ~tree_iterator() {}
 			
-			tree_iterator&		operator++() {
-				if (node != nil)
-					node = next_node(node, nil);
-				return *this;
+			tree_iterator 		&operator=(tree_iterator const &lhs)	{
+				if (this == &lhs)
+					return (*this);
+				this->_ptr = lhs._ptr;
+				this->_root = lhs._root;
+				this->_nil = lhs._nil;
+				return (*this);
 			}
-			
-			tree_iterator&		operator--() {
-				if (node == nil)
-					node = max_node(root, nil);
-				node = prev_node(node, nil);
-				return *this;
+
+			reference 			operator*() {return (_ptr->data);}
+			const_reference 	operator*() const {return (_ptr->data);}
+			pointer 			operator->() {return (&(operator*()));}
+			const_pointer 		operator->() const {return (&(operator*()));}
+
+			tree_iterator &operator++()	{
+				if (_ptr != _nil)
+					_ptr = successor(_ptr);
+				return (*this);
 			}
+
+			tree_iterator &operator--()	{
+				if (_ptr == _nil)
+					_ptr = maximum(_root);
+				else
+					_ptr = predecessor(_ptr);
+				return (*this);
+			}
+
+			tree_iterator 		operator++(int)	{tree_iterator tmp(*this); operator++(); return (tmp);}
+			tree_iterator 		operator--(int)	{tree_iterator tmp(*this); operator--(); return (tmp);}
+
+			bool 				operator==(tree_iterator<value_type, node_type> const &lhs) const 	{return (this->_ptr == lhs._ptr);}
+			bool 				operator!=(tree_iterator<value_type, node_type> const &lhs) const	{return (this->_ptr != lhs._ptr);}
 			
-			tree_iterator 		operator++(int) {tree_iterator tmp = *this; ++*this; return tmp;}
-			tree_iterator 		operator--(int) {tree_iterator tmp = *this; --*this; return tmp;}
+			// Overload called when trying to copy construct a const_iterator
+			// based on an iterator
+			operator tree_iterator<value_type const, node_type const>() const {return tree_iterator<value_type const, node_type const>(_ptr, _root, _nil);}
+		
+		protected:
+			// find the node with the minimum key
+			node_ptr minimum(node_ptr node)	{
+				while (node->left != _nil)
+					node = node->left;
+				return node;
+			}
+
+			// find the node with the maximum key
+			node_ptr maximum(node_ptr node)	{
+				while (node->right != _nil)
+					node = node->right;
+				return node;
+			}
+
+			// find the successor of a given node
+			node_ptr successor(node_ptr x)	{
+				// if the right subtree is not null the successor is the leftmost node in the sright subtree
+				if (x->right != _nil)
+					return minimum(x->right);
+				// else it is the lowest ancestor of x whose left child is also an ancestor of x
+				node_ptr y = x->parent;
+				while (y != NULL && x == y->right)
+				{
+					x = y;
+					y = y->parent;
+				}
+				if (y == NULL)
+					return _nil;
+				return y;
+			}
+
+			// find the predecessor of a given node
+			node_ptr predecessor(node_ptr x) {
+				// if the left subtree is not null the predecessor is the rightmost node in the left subtree
+				if (x->left != _nil)
+					return maximum(x->left);
+				node_ptr y = x->parent;
+				while (y != NULL && x == y->left)
+				{
+					x = y;
+					y = y->parent;
+				}
+				return y;
+			}
 	};
 
-	template<typename P1, typename P2>
-	inline bool operator==(const tree_iterator<P1, RBNode<P1> >& lhs, const tree_iterator<P2, RBNode<P2> >& rhs) {return lhs.node == rhs.node;}
-	
-	template<typename P1, typename P2>
-	inline bool operator!=(const tree_iterator<P1, RBNode<P1> >& lhs, const tree_iterator<P2, RBNode<P2> >& rhs) {return !(lhs == rhs);}
-	// ---------- End of tree iterator
-}
+} // namespace ft
 
 #endif
