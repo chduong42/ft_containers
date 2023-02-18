@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 23:06:09 by chduong           #+#    #+#             */
-/*   Updated: 2023/01/26 15:03:48 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/18 18:07:15 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ namespace ft
 
 	template <class T1,class T2>
 	pair<T1,T2> make_pair (T1 x, T2 y) { return ( pair<T1,T2>(x,y) ); }
-	
+
 }
 
 #endif

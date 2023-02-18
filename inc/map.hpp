@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 22:09:12 by chduong           #+#    #+#             */
-/*   Updated: 2023/02/17 16:21:34 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/18 18:32:01 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,29 +18,27 @@
 
 namespace ft
 {
+	template <class T, class Key>
+	struct get_key : public std::unary_function<T, Key>	{
+		const Key &operator()(const T &x) const	{return (x.first);}
+	};
+
 	template < class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<ft::pair<const Key,T> > >
 	class map {
 		public:
-			typedef Key 															key_type;
-			typedef T 																mapped_type;
-			typedef ft::pair<const key_type, mapped_type> 							value_type;
-			typedef Compare 														key_compare;
-			typedef Alloc 															allocator_type;
-			typedef RBNode<value_type> 												node_type;
-			typedef RBNode<value_type>* 											node_ptr;
+			typedef Key 																			key_type;
+			typedef T 																				mapped_type;
+			typedef ft::pair<const key_type, mapped_type> 											value_type;
+			typedef Compare 																		key_compare;
+			typedef Alloc 																			allocator_type;
+							
+			typedef typename allocator_type::reference 												reference;
+			typedef typename allocator_type::const_reference 										const_reference;
+			typedef typename allocator_type::pointer 												pointer;
+			typedef typename allocator_type::const_pointer 											const_pointer;
+			typedef typename allocator_type::difference_type 										difference_type;
+			typedef typename allocator_type::size_type 												size_type;
 			
-			typedef typename allocator_type::reference 								reference;
-			typedef typename allocator_type::const_reference 						const_reference;
-			typedef typename allocator_type::pointer 								pointer;
-			typedef typename allocator_type::const_pointer 							const_pointer;
-			typedef typename allocator_type::difference_type 						difference_type;
-			typedef typename allocator_type::size_type 								size_type;
-			
-			typedef ft::tree_iterator<value_type, node_type> 						iterator;
-			typedef ft::tree_iterator<value_type const, node_type const> 			const_iterator;
-			typedef ft::reverse_iterator<iterator> 									reverse_iterator;
-			typedef ft::reverse_iterator<const_iterator> 							const_reverse_iterator;
-
 			class value_compare : public std::binary_function<value_type, value_type, bool> {
 				friend class map;
 				protected:
@@ -54,12 +52,19 @@ namespace ft
 					bool			operator()(const key_type& x, const key_type& y) const		{return comp(x, y);}
 			};
 			
-			typedef RBtree<key_type, value_type, value_compare> 					tree_type;
+			typedef RBTree<key_type, value_type, get_key<value_type, key_type>, value_compare> 		tree_type;
+			typedef typename tree_type::node_type 													node_type;
+			typedef typename tree_type::node_ptr 													node_ptr;
+			
+			typedef ft::tree_iterator<value_type, node_type> 										iterator;
+			typedef ft::tree_iterator<value_type const, node_type const> 							const_iterator;
+			typedef ft::reverse_iterator<iterator> 													reverse_iterator;
+			typedef ft::reverse_iterator<const_iterator> 											const_reverse_iterator;
 
 		private:
-			key_compare																_comp;
-			allocator_type															_alloc;
-			tree_type																_tree;
+			key_compare				_comp;
+			allocator_type			_alloc;
+			tree_type				_tree;
 		
 		public:
 			explicit map(const key_compare &comp = key_compare(), const allocator_type &alloc = allocator_type()): _comp(comp), _alloc(alloc), _tree(value_comp()) {}
@@ -83,8 +88,8 @@ namespace ft
 				return *this;
 			}
 
-			iterator					begin() { return iterator(_tree.minimum(), _tree.getRoot(), _tree.getNil());}
-			const_iterator				begin() const { return const_iterator(_tree.minimum(), _tree.getRoot(), _tree.getNil());}
+			iterator					begin() { return iterator(_tree.minimum(_tree.getRoot()), _tree.getRoot(), _tree.getNil());}
+			const_iterator				begin() const { return const_iterator(_tree.minimum(_tree.getRoot()), _tree.getRoot(), _tree.getNil());}
 			iterator					end() { return iterator(_tree.getNil(), _tree.getRoot(), _tree.getNil());}
 			const_iterator				end() const { return const_iterator(_tree.getNil(), _tree.getRoot(), _tree.getNil());}
 			reverse_iterator			rbegin() { return reverse_iterator(end());}
@@ -109,8 +114,7 @@ namespace ft
 
 				if (val != _tree.getNil())
 					return (val->data.second);
-				else
-				{
+				else {
 					_tree.insertNode(value_type(k, mapped_type())); // insert returns a pair an first element of pair is an it
 					val = _tree.searchTree(k);
 					return (val->data.second);
@@ -176,8 +180,7 @@ namespace ft
 				iterator beg = this->begin();
 				iterator end = this->end();
 
-				while (beg != end)
-				{
+				while (beg != end)	{
 					if (_comp((*beg).first, k) == false)
 						break;
 					beg++;
@@ -190,8 +193,7 @@ namespace ft
 				const_iterator beg = this->begin();
 				const_iterator end = this->end();
 
-				while (beg != end)
-				{
+				while (beg != end)	{
 					if (_comp((*beg).first, k) == false)
 						break;
 					beg++;
@@ -204,8 +206,7 @@ namespace ft
 				iterator beg = this->begin();
 				iterator end = this->end();
 
-				while (beg != end)
-				{
+				while (beg != end)	{
 					if (_comp(k ,(*beg).first))
 						break;
 					beg++;
@@ -218,8 +219,7 @@ namespace ft
 				const_iterator beg = this->begin();
 				const_iterator end = this->end();
 
-				while (beg != end)
-				{
+				while (beg != end)	{
 					if (_comp(k, (*beg).first))
 						break;
 					beg++;

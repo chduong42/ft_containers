@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 15:17:18 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/02/17 20:38:22 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/18 15:56:40 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,15 +213,15 @@ namespace ft
 
 			tree_iterator &operator++()	{
 				if (_ptr != _nil)
-					_ptr = successor(_ptr, _nil);
+					_ptr = nextNode(_ptr);
 				return (*this);
 			}
 
 			tree_iterator &operator--()	{
 				if (_ptr == _nil)
-					_ptr = maxNode(_root, _nil);
+					_ptr = maxNode(_root);
 				else
-					_ptr = predecessor(_ptr, _nil);
+					_ptr = prevNode(_ptr);
 				return (*this);
 			}
 
@@ -236,11 +236,25 @@ namespace ft
 			operator tree_iterator<value_type const, node_type const>() const {return tree_iterator<value_type const, node_type const>(_ptr, _root, _nil);}
 		
 		protected:
-			// find the successor of a given node
-			node_ptr successor(node_ptr node, node_ptr nil)	{
-				// if the right subtree is not null the successor is the leftmost node in the sright subtree
-				if (node->right != nil)
-					return minNode(node->right, nil);
+		// find the node with the minimum key
+			node_ptr minNode(node_ptr node)	{
+				while (node->left != _nil)
+					node = node->left;
+				return node;
+			}
+
+			// find the node with the maximum key
+			node_ptr maxNode(node_ptr node)	{
+				while (node->right != _nil)
+					node = node->right;
+				return node;
+			}
+
+			// find the nextNode of a given node
+			node_ptr nextNode(node_ptr node)	{
+				// if the right subtree is not null the nextNode is the leftmost node in the sright subtree
+				if (node->right != _nil)
+					return minNode(node->right);
 				// else it is the lowest ancestor of node whose left child is also an ancestor of node
 				node_ptr parent = node->parent;
 				while (parent != NULL && node == parent->right)	{
@@ -248,15 +262,15 @@ namespace ft
 					parent = parent->parent;
 				}
 				if (parent == NULL)
-					return nil;
+					return _nil;
 				return parent;
 			}
 
-			// find the predecessor of a given node
-			node_ptr predecessor(node_ptr node, node_ptr nil)	{
-				// if the left subtree is not null the predecessor is the rightmost node in the left subtree
-				if (node->left != nil)
-					return maxNode(node->left, nil);
+			// find the prevNode of a given node
+			node_ptr prevNode(node_ptr node)	{
+				// if the left subtree is not null the prevNode is the rightmost node in the left subtree
+				if (node->left != _nil)
+					return maxNode(node->left);
 				node_ptr parent = node->parent;
 				while (parent != NULL && node == parent->left)	{
 					node = parent;
