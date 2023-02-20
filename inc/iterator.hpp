@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 15:17:18 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/02/18 15:56:40 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/20 20:24:34 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ namespace ft
 		typedef const T*									pointer;
 		typedef const T&									reference;
 	};
-
+	
 	// ---------- Reverse iterator
 	template<class Iter>
 	class reverse_iterator {
@@ -63,18 +63,11 @@ namespace ft
 			typedef typename ft::iterator_traits<Iter>::reference			reference;
 		
 		protected:
-			iterator_type												_base;
+			iterator_type													_base;
 			
 		public:
-			// --------- Constructors
-			reverse_iterator() 													: _base() {}
-			explicit reverse_iterator(Iter node) 									: _base(node) {}
-			template<class U> reverse_iterator(const reverse_iterator<U>& src)	: _base(src.base()) {}
-			virtual ~reverse_iterator() {} // Destructor
-			
-			// ---------- Operators
-			template<class U>
-			reverse_iterator& 	operator=(const reverse_iterator<U>& other) {_base = other.base(); return *this;}
+			explicit reverse_iterator(iterator_type const &it = iterator_type())	: _base(it) {}
+			template<class U> reverse_iterator(const reverse_iterator<U>& src)		: _base(src.base()) {}
 
 			iterator_type 		base() const {return _base;}
 			reference			operator[]( difference_type n ) const {return _base[-n-1];}
@@ -161,17 +154,6 @@ namespace ft
 	template<class Iter1, class Iter2> inline typename random_access_iterator<Iter1>::difference_type
 	operator- (const ft::random_access_iterator<Iter1>& lhs, const ft::random_access_iterator<Iter2>& rhs) {return lhs.base() - rhs.base();}
 	// ---------- End of Random access iterator
-	
-	// utility functions
-	template<typename Iterator>
-	typename iterator_traits<Iterator>::difference_type distance(Iterator first, Iterator last) {
-		typename iterator_traits<Iterator>::difference_type dist = 0;
-		while (first != last) {
-			++dist;
-			++first;
-		}
-		return (dist);
-	}
 
 	template< class T, class N >
 	class tree_iterator	: public std::iterator<std::bidirectional_iterator_tag, T> {

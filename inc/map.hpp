@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 22:09:12 by chduong           #+#    #+#             */
-/*   Updated: 2023/02/18 18:32:01 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/20 15:11:47 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ namespace ft
 			typedef ft::pair<const key_type, mapped_type> 											value_type;
 			typedef Compare 																		key_compare;
 			typedef Alloc 																			allocator_type;
-							
 			typedef typename allocator_type::reference 												reference;
 			typedef typename allocator_type::const_reference 										const_reference;
 			typedef typename allocator_type::pointer 												pointer;
@@ -51,11 +50,13 @@ namespace ft
 					bool			operator()(const key_type& x, const value_type& y) const 	{return comp(x, y.first);}
 					bool			operator()(const key_type& x, const key_type& y) const		{return comp(x, y);}
 			};
-			
+		
+		private:
 			typedef RBTree<key_type, value_type, get_key<value_type, key_type>, value_compare> 		tree_type;
 			typedef typename tree_type::node_type 													node_type;
 			typedef typename tree_type::node_ptr 													node_ptr;
-			
+		
+		public:
 			typedef ft::tree_iterator<value_type, node_type> 										iterator;
 			typedef ft::tree_iterator<value_type const, node_type const> 							const_iterator;
 			typedef ft::reverse_iterator<iterator> 													reverse_iterator;
@@ -248,6 +249,10 @@ namespace ft
 
 	template <class Key, class T, class Compare, class Alloc>
 	bool operator>=(const map<Key, T, Compare, Alloc> &lhs, const map<Key, T, Compare, Alloc> &rhs)	{return (!(lhs < rhs));	}
+
+	template< class Key, class T, class Compare, class Alloc >
+	void swap( map<Key, T, Compare, Alloc>& lhs, map<Key, T, Compare, Alloc>& rhs ) { lhs.swap(rhs);}
+	
 }
 
 #endif

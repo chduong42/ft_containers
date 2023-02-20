@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: kennyduong <kennyduong@student.42.fr>      +#+  +:+       +#+         #
+#    By: chduong <chduong@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/10 17:16:04 by chduong           #+#    #+#              #
-#    Updated: 2023/01/20 15:23:02 by kennyduong       ###   ########.fr        #
+#    Updated: 2023/02/20 14:30:26 by chduong          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,10 +17,10 @@ NAME		=	test
 STD 		=	std
 
 CXX			=	c++ -c
-CXXFLAGS	=	-Wall -Wextra -Werror $(INC) $(DEPFLAG)
+CXXFLAGS	=	-Wall -Wextra -Werror $(INC) $(DPFLAG)
 VERSION		=	-std=c++98 
 INC			=	-I inc
-DEPFLAG		=	-MMD -MP
+DPFLAG		=	-MMD -MP
 DEBUG		=	-g3 -fsanitize=address,undefined
 
 LINK		=	c++
@@ -38,7 +38,7 @@ MEMCHECK	=	--tool=memcheck
 #########################################
 #	SOURCES - OBJECTS - DEPENDENCIES	#
 #########################################
-SRC			=	rbt_test.cpp
+SRC			=	main.cpp
 
 SRC_DIR		=	src/
 OBJ_DIR		=	obj/
@@ -71,7 +71,7 @@ $(STD): obj/stdfunc_test.o
 all: $(NAME)
 
 check:
-	$(VALGRIND) $(NAME)
+	$(VALGRIND) $(STD)
 
 clean:
 	@$(RM) $(OBJ_DIR)

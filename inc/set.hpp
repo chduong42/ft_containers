@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 16:08:00 by chduong           #+#    #+#             */
-/*   Updated: 2023/02/18 18:32:21 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/20 15:12:29 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ namespace ft
 			typedef T 																				value_type;
 			typedef Compare 																		key_compare;
 			typedef Alloc 																			allocator_type;
-							
 			typedef typename allocator_type::reference 												reference;
 			typedef typename allocator_type::const_reference 										const_reference;
 			typedef typename allocator_type::pointer 												pointer;
@@ -48,19 +47,21 @@ namespace ft
 					bool			operator()(const key_type& x, const key_type& y) const		{return comp(x, y);}
 			};
 
+		private:
 			typedef ft::RBTree<key_type, value_type, get_key<value_type, key_type>, value_compare> 	tree_type;
 			typedef typename tree_type::node_type 													node_type;
 			typedef typename tree_type::node_ptr 													node_ptr;
-				
+		
+		public:
 			typedef ft::tree_iterator<value_type const, node_type const> 							iterator;
 			typedef ft::tree_iterator<value_type const, node_type const> 							const_iterator;
 			typedef ft::reverse_iterator<iterator> 													reverse_iterator;
 			typedef ft::reverse_iterator<const_iterator> 											const_reverse_iterator;
 
 		private:
-			key_compare 													_comp;
-			allocator_type 													_alloc;
-			tree_type 														_tree;
+			key_compare 					_comp;
+			allocator_type 					_alloc;
+			tree_type 						_tree;
 
 		public:
 			explicit set(const key_compare &comp = key_compare(), const allocator_type &alloc = allocator_type()): _comp(comp), _alloc(alloc), _tree(value_comp()) {}
