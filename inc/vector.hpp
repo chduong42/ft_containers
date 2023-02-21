@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/16 18:56:26 by kennyduong        #+#    #+#             */
-/*   Updated: 2023/02/20 20:23:55 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/21 22:34:13 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,25 +97,29 @@ namespace ft {
 		bool 						empty() const {return (size() == 0 ? true : false);}
 
 		void 	resize(size_type n, value_type val = value_type()) {
-			if (n > _capacity) reserve(n);
-			if (n >= _size) {
-				for (size_type i = _size; i < n; i++)
-				_alloc.construct(_data + i, val);
-			} else {
+			// Si n est plus petit que la taille actuelle, détruire les éléments supplémentaires
+		    if (n < _size) {
 				for (size_type i = n; i < _size; i++)
-				_alloc.destroy(_data + i);
-				_capacity = n;
+					_alloc.destroy(_data + i);
+			} else if (n > _size) { // Si n est plus grand que la taille actuelle, ajouter des éléments avec la valeur val
+				if (n > _capacity)
+					reserve(n);
+				for (size_type i = _size; i < n; i++)
+					_alloc.construct(_data + i, val);
 			}
 			_size = n;
 		}
 		
-		void 	reserve(size_type n) {
-			if (n > max_size()) {
-				throw (std::length_error("ft::vector::reserve"));
-			} else if (n > _capacity) {
+		void 	reserve(size_type n){
+			if (n > max_size())
+				throw std::length_error("vector::reserve");
+			// Allouer de la nouvelle mémoire et déplacer les éléments
+			if (n > _capacity) {
 				pointer new_data = _alloc.allocate(n);
-				for (size_type i = 0; i < _size; i++)
-				_alloc.construct(new_data + i, *(_data + i));
+				for (size_type i = 0; i < _size; i++) {
+					_alloc.construct(new_data + i, *(_data + i));
+					_alloc.destroy(_data + i);
+				}
 				_alloc.deallocate(_data, _capacity);
 				_data = new_data;
 				_capacity = n;
@@ -131,13 +135,13 @@ namespace ft {
 		const_reference 	back() const {return (*(end() - 1));}
 		reference 			at(size_type n) {
 			if (n >= size())
-				throw (std::out_of_range("ft::vector::at"));
+				throw (std::out_of_range("vector::at"));
 			else
 				return (_data[n]);
 		}
 		const_reference 	at(size_type n) const {
 			if (n >= size())
-				throw (std::out_of_range("ft::vector::at"));
+				throw (std::out_of_range("vector::at"));
 			else
 				return (_data[n]);
 		}
@@ -163,10 +167,12 @@ namespace ft {
 
 		// Adds a new element at the end of the vector, after its current last element. The content of val is copied (or moved) to the new element.
 		void push_back(const value_type& val) {
-			if (_size == _capacity)
-				empty() ? reserve(1) : reserve(_size * 2);
+		   if (_size == _capacity) {
+				size_type new_capacity = (_capacity == 0) ? 1 : _capacity * 2;
+				reserve(new_capacity);
+			}
 			_alloc.construct(_data + _size, val);
-			_size++;
+			++_size;
 		}
 
 		// Removes the last element in the vector, effectively reducing the container size by one.
@@ -179,13 +185,13 @@ namespace ft {
 
 		// The vector is extended by inserting new elements before the element at the specified position, effectively increasing the container size by the number of elements inserted.
 		iterator insert (iterator position, const value_type& val) {
-			size_type n = ft::distance(begin(), position);
+			size_type n = std::distance(begin(), position);
 			insert(position, 1, val);
 			return (iterator(&this->_data[n]));
 		}
 		void insert (iterator position, size_type n, const value_type& val) {
 			vector tmp(position, end());
-			this->_size -= ft::distance(position, end());
+			this->_size -= std::distance(position, end());
 			while (n) {
 				push_back(val);
 				--n;
@@ -199,7 +205,7 @@ namespace ft {
 		template <class InputIterator>
 		void insert (iterator position, InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0) {
 			vector tmp(position, end());
-			this->_size -= ft::distance(position, end());
+			this->_size -= std::distance(position, end());
 			while (first != last) {
 				push_back(*first);
 				++first;

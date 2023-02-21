@@ -6,7 +6,7 @@
 /*   By: chduong <chduong@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/14 22:09:12 by chduong           #+#    #+#             */
-/*   Updated: 2023/02/20 15:11:47 by chduong          ###   ########.fr       */
+/*   Updated: 2023/02/21 22:58:31 by chduong          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,6 @@
 
 namespace ft
 {
-	template <class T, class Key>
-	struct get_key : public std::unary_function<T, Key>	{
-		const Key &operator()(const T &x) const	{return (x.first);}
-	};
-
 	template < class Key, class T, class Compare = std::less<Key>, class Alloc = std::allocator<ft::pair<const Key,T> > >
 	class map {
 		public:
@@ -52,6 +47,11 @@ namespace ft
 			};
 		
 		private:
+			template <class _T, class _Key>
+			struct get_key : public std::unary_function<_T, _Key> {
+				const _Key &operator()(const _T &x) const {return (x.first);}
+			};
+
 			typedef RBTree<key_type, value_type, get_key<value_type, key_type>, value_compare> 		tree_type;
 			typedef typename tree_type::node_type 													node_type;
 			typedef typename tree_type::node_ptr 													node_ptr;

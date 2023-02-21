@@ -6,18 +6,18 @@
 #    By: chduong <chduong@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/10 17:16:04 by chduong           #+#    #+#              #
-#    Updated: 2023/02/20 14:30:26 by chduong          ###   ########.fr        #
+#    Updated: 2023/02/21 23:03:23 by chduong          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 #########################################
 #		EXEC, COMMANDS & FLAGS			#
 #########################################
-NAME		=	test
-STD 		=	std
+NAME		= 	ft_container
+STD			=	std_container
 
 CXX			=	c++ -c
-CXXFLAGS	=	-Wall -Wextra -Werror $(INC) $(DPFLAG)
+CXXFLAGS	=	-Wall -Wextra -Werror $(VERSION) $(INC) $(DPFLAG)
 VERSION		=	-std=c++98 
 INC			=	-I inc
 DPFLAG		=	-MMD -MP
@@ -38,37 +38,47 @@ MEMCHECK	=	--tool=memcheck
 #########################################
 #	SOURCES - OBJECTS - DEPENDENCIES	#
 #########################################
-SRC			=	main.cpp
+SRC			=	main.cpp \
+				test_map.cpp \
+				test_set.cpp \
+				test_vector.cpp \
+				test_stack.cpp
+
+STDSRC		= 	main_std.cpp \
+				test_map_std.cpp \
+				test_set_std.cpp \
+				test_vector_std.cpp \
+				test_stack_std.cpp	
 
 SRC_DIR		=	src/
 OBJ_DIR		=	obj/
 OBJ			=	$(SRC:%.cpp=%.o)
 OBJ			:=	$(addprefix $(OBJ_DIR), $(OBJ))
+
+STDOBJ		=	$(STDSRC:%.cpp=%.o)
+STDOBJ		:=	$(addprefix $(OBJ_DIR), $(STDOBJ))
+
 DEP			=	${OBJ:.o=.d}
 
 #########################################
 #			MAKE	RULES				#
 #########################################
-$(NAME): $(OBJ)
-	@echo "> $(CYAN)Generate objects$(END) : \t\t[$(GREEN)OK$(END)]"
-	@$(LINK) $(LFLAGS) -o $@ $^
-	@echo "> $(CYAN)Compilation$(END) : \t\t[$(YELLOW)COMPLETE$(END)]"
+all: $(NAME) $(STD)
 
+$(NAME): $(OBJ)
+	@$(LINK) $(OBJ) -o $@ 
+	@echo "> $(CYAN)Compilation FT TEST$(END) : \t\t[$(YELLOW)COMPLETE$(END)]"
+
+$(STD): $(STDOBJ)
+	@$(LINK) $(STDOBJ) -o $@ 
+	@echo "> $(CYAN)Compilation STD TEST$(END) : \t\t[$(YELLOW)COMPLETE$(END)]"
+	
 -include ${DEP}
 
 ${OBJ_DIR}%.o:	${SRC_DIR}%.cpp
 	@${MKDIR} ${@D}
 	${CXX} ${CXXFLAGS} -std=c++98 $< -o $@
 
-obj/stdfunc_test.o: src/stdfunc_test.cpp
-	@${MKDIR} ${@D}
-	${CXX} ${CXXFLAGS} -std=c++11 $< -o $@
-
-$(STD): obj/stdfunc_test.o
-	@$(LINK) $(LFLAGS) -o $@ $^
-	@echo "> $(CYAN)Compilation STD TEST$(END) : \t\t[$(YELLOW)COMPLETE$(END)]"
-
-all: $(NAME)
 
 check:
 	$(VALGRIND) $(STD)
